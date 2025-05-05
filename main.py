@@ -18,12 +18,15 @@ if __name__ in "__main__":
     while word != "0":
           word = input("Enter your word: ")
           if word == "0":
+               os.system("cls")
                print("Exiting...")
           else:
 
                data = get_word_data(word)
                print("Word:", data[0]['word'])
                print("Definition:", data[0]['meanings'][0]['definitions'][0]['definition'])
+               os.system("pause")
+               os.system("cls")
      
         
 
