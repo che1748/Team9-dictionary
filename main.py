@@ -9,11 +9,15 @@ def main():
     
     while word != "0":
         word = input("Enter your word: ").strip().lower()
+     #   Specify the language
+     #    language = print("Enter the language (e.g., 'en' for English): ").strip().lower()
+        
         if word == "0":
             os.system("cls")
             print("Exiting...")
         else:
             # Create an instance of DictionaryReader
+            os.system("cls")
             dictionary_reader = DictionaryReader(word)
             
             # Fetch and display the word data
