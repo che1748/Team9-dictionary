@@ -7,7 +7,7 @@ class DictionaryReader:
         self.word = word
         self.data = self.get_word_data()  # Removed the argument 'word'
   
-    def check_data(self, url):
+    def check_data(self, url): ## This function checks if the data is available or not
         try:
             response = requests.get(url)
             response.raise_for_status()
@@ -17,8 +17,10 @@ class DictionaryReader:
         except Exception as err:
             print(f"An error occurred: {err}")
         return None
-    
-    def get_word_data(self):
+   
+   
+    ## we will need parameters self, word , language = '',
+    def get_word_data(self): ## This function fetches the data from the API
         url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{self.word}"
         response = requests.get(url) 
         if response.status_code != 200:
@@ -26,7 +28,7 @@ class DictionaryReader:
             return None
         return response.json()
 
-    def data_reader(self, data):
+    def data_reader(self, data): ## This function reads the data and prints it in a readable format
         if data:
             # Print the word and its meanings
             for entry in data:
@@ -37,3 +39,7 @@ class DictionaryReader:
                         print(f"Definition: {definition['definition']}")
         else:
             print("No data found for the word.")
+
+
+    ## add get entry function to get the entry of the word
+    

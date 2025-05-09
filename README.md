@@ -1,7 +1,8 @@
 # Team9-dictionary
 This is a project is for CSE 310.
 
+Creating a MiiltiligualDictionary based on a set of API and recieving the defition based on the languale 
 
 Next meeting:
-1. Try using a bigger API with multilingual languages
-2.  Try abstracting and using classes.
+1. implement the new multiligual api 
+2.  start fixing up the UI
