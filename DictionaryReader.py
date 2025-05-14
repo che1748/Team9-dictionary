@@ -45,6 +45,7 @@ class DictionaryReader:
         except requests.exceptions.RequestException as e:
             print(f"Error fetching data: {e}")
             return None
+    
 
     def data_reader(self):
         if not self.data:
@@ -52,8 +53,25 @@ class DictionaryReader:
             return
 
         for entry in self.data:
-            word = entry.get("headword", {}).get("text", "Unknown")
-            pos = entry.get("headword", {}).get("pos", "Unknown")
+            word = entry.get("headword", {}).get("text", [])
+            pos = entry.get("headword", {}).get("pos", [])
+            # if not words or not pos:
+            #     print("No word or part of speech found.")
+            #     exit()
+            # else:
+            #     for i, word in enumerate(words [:len(words)], 1):
+            #         if i == 1:
+            #             word = word
+            #         else:
+            #             word = f"{word} ({i})"
+            #             print(f"\n🔤 Word: {word}")
+            #     for i, pos in enumerate(pos[:len(pos)], 1):
+            #         if i == 1:
+            #             pos = pos
+            #         else:
+            #             pos = f"{pos} ({i})"
+            #             print(f"\n📚 Part of Speech: {pos}")
+                    
             
             print(f"\n🔤 Word: {word}")
             print(f"📚 Part of Speech: {pos}")
@@ -62,10 +80,11 @@ class DictionaryReader:
             if not senses:
                 print("No definitions found.")
             else:
-                for i, sense in enumerate(senses[:3], 1):
+                for i, sense in enumerate(senses[:len(senses)], 1):
                     definition = sense.get("definition", "No definition found")
                     print(f"{i}. {definition}")
-                    
+
+             
 
 
     def get_entry(self):

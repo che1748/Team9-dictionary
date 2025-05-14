@@ -4,20 +4,25 @@ from lexicala_api import LexicalaAPI
 import lexicala_main
 
 def main():
-    word = "1"
-    supported_languages = ['en', 'fr', 'ja', 'es']
+    language = "1"
+    supported_languages = ["ar", "ca", "zh", "tw", "hr", "cs", "da", "nl", "en", "et", "fi", "fr", "fy", "de", "el", "he", "hi", "hu", "id", "it", "ja", "ko", "la", "lv", "ml", "no", "pl", "br", "pt", "ru", "sl", "es", "sv", "th", "tr", "uk"
+]
 
-    while word != "0":
-        word = input("Enter your word (or 0 to exit): ").strip().lower()
-        if word == "0":
+    
+
+    while language != "0":
+
+        language = input("Enter the language (e.g., 'en' for English): (or 0 to exit) ").strip().lower()
+        if language == "0":
             os.system("cls")
             print("Exiting...")
             return 
-
-        language = input("Enter the language (e.g., 'en' for English): ").strip().lower()
         while language not in supported_languages:
             print("Language not supported. Choose from: en, fr, ja, es")
             language = input("Enter the language again: ").strip().lower()
+        word = input("Enter your word: ").strip().lower()
+        
+        
         
         os.system("cls")
         print("Fetching data...")
