@@ -15,77 +15,67 @@ class DictionaryReader:
             raise ValueError("API key is not set.")
         self.headers = {
             "x-rapidapi-host": "lexicala1.p.rapidapi.com",
-            "x-rapidapi-key": self.api_key  # Your API key
+            "x-rapidapi-key": self.api_key
         }
         self.data = self.get_word_data()
-        
-        
 
     def get_word_data(self):
         querystring = {
-            "text": self.word,  # Word to search for
-            "language": self.lang,  # Language code (e.g., 'en', 'fr', 'ja')
+            "text": self.word,
+            "language": self.lang,
         }
-        
         try:
-            # Send GET request with query parameters and headers
             response = requests.get(self.base_url, headers=self.headers, params=querystring)
-            response.raise_for_status()  # Check for successful response
-            
-            # Check if response is successful (status code 200)
+            response.raise_for_status()
             if response.status_code == 200:
                 data = response.json()
-                api_response = json.dumps(data, indent=4)  # Pretty print the JSON response
-                print(f"API Response: {api_response}")
-                return data.get("results", [])  # Adjust this based on the actual API response structure
+                print(f"API Response: {json.dumps(data, indent=4)}")
+                return data.get("results", [])
             else:
                 print(f"Request failed: {response.status_code}, {response.text}")
                 return None
-
         except requests.exceptions.RequestException as e:
             print(f"Error fetching data: {e}")
             return None
-    
+
+    def get_entry(self): 
+        return self.data
 
     def data_reader(self):
-        if not self.data:
+        data = self.get_entry()
+
+        if not data:
             print("No data found for the word.")
             return
 
-        for entry in self.data:
-            word = entry.get("headword", {}).get("text", [])
-            pos = entry.get("headword", {}).get("pos", [])
-            # if not words or not pos:
-            #     print("No word or part of speech found.")
-            #     exit()
-            # else:
-            #     for i, word in enumerate(words [:len(words)], 1):
-            #         if i == 1:
-            #             word = word
-            #         else:
-            #             word = f"{word} ({i})"
-            #             print(f"\n🔤 Word: {word}")
-            #     for i, pos in enumerate(pos[:len(pos)], 1):
-            #         if i == 1:
-            #             pos = pos
-            #         else:
-            #             pos = f"{pos} ({i})"
-            #             print(f"\n📚 Part of Speech: {pos}")
-                    
-            
-            print(f"\n🔤 Word: {word}")
-            print(f"📚 Part of Speech: {pos}")
+        for entry in data:
+
+            print("Entry ID:", entry.get("id"))
+            print("Language:", entry.get("language"))
+
+            # Normalize headwords to always be a list
+            raw_headwords = entry.get("headword", [])
+            headwords = raw_headwords if isinstance(raw_headwords, list) else [raw_headwords]
+
+            grouped = {}
+            for hw in headwords:
+                word_text = hw.get("text", "")
+                word_pos = hw.get("pos", "")
+                
+                if word_pos not in grouped:
+                    grouped[word_pos] = []
+                grouped[word_pos].append(word_text)
+
+            for pos, words in grouped.items():
+                word_list = ", ".join(words)
+                print(f"🔤 Word(s): {word_list}")
+                print(f"📚 Part of Speech: {pos}\n")
 
             senses = entry.get("senses", [])
             if not senses:
                 print("No definitions found.")
             else:
-                for i, sense in enumerate(senses[:len(senses)], 1):
-                    definition = sense.get("definition", "No definition found")
-                    print(f"{i}. {definition}")
-
-             
-
-
-    def get_entry(self):
-        return self.data
+                for i, sense in enumerate(senses, 1):
+                    definition = sense.get("definition")
+                    if definition:
+                        print(f"{i}. {definition}")

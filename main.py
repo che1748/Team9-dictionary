@@ -2,28 +2,25 @@ import os
 from DictionaryReader import DictionaryReader 
 from lexicala_api import LexicalaAPI 
 import lexicala_main
-
-def main():
-    language = "1"
-    supported_languages = ["ar", "ca", "zh", "tw", "hr", "cs", "da", "nl", "en", "et", "fi", "fr", "fy", "de", "el", "he", "hi", "hu", "id", "it", "ja", "ko", "la", "lv", "ml", "no", "pl", "br", "pt", "ru", "sl", "es", "sv", "th", "tr", "uk"
-]
+import executing
 
     
 
-    while language != "0":
+def main():
+    language = "1"
+    supported_languages = ["ar", "ca", "zh", "tw", "hr", "cs", "da", "nl", "en", "et", "fi", "fr", "fy", "de", "el", "he", "hi", "hu", "id", "it", "ja", "ko", "la", "lv", "ml", "no", "pl", "br", "pt", "ru", "sl", "es", "sv", "th", "tr", "uk"]
 
+    while language != "0":
         language = input("Enter the language (e.g., 'en' for English): (or 0 to exit) ").strip().lower()
         if language == "0":
             os.system("cls")
             print("Exiting...")
-            return 
+            return
         while language not in supported_languages:
             print("Language not supported. Choose from: en, fr, ja, es")
             language = input("Enter the language again: ").strip().lower()
         word = input("Enter your word: ").strip().lower()
-        
-        
-        
+
         os.system("cls")
         print("Fetching data...")
 
@@ -38,7 +35,7 @@ def main():
         input("\nPress Enter to continue...")
         os.system("cls")
 
-if __name__ == "__main__":  
+if __name__ == "__main__":
     main()
 
         

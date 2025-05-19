@@ -14,3 +14,7 @@ Sprint 2:
 
 Future thoughts:
 We want to create a feature that lets users add a word to a personal file (like a favorites file, or learned/mastered words.)
+
+
+times used API per day - 
+||
