@@ -5,14 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multilingual Dictionary</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
     <main>
         <form class="dictionary-form" action="#" method="GET">
+           
             <h2>Multilingual Dictionary Lookup</h2>
-
             <select name="language" required>
                 <option value="ar">Arabic</option>
                 <option value="ca">Catalan</option>
@@ -55,8 +55,10 @@
             <input type="text" name="word" placeholder="Enter a word..." required />
 
             <button type="submit">Search</button>
+            
         </form>
     </main>
 </body>
+
 
 </html>

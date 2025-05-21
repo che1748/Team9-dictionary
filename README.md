@@ -17,4 +17,4 @@ We want to create a feature that lets users add a word to a personal file (like 
 
 
 times used API per day - 
-||
+|||||

@@ -50,8 +50,6 @@ class DictionaryReader:
 
         for entry in data:
 
-            print("Entry ID:", entry.get("id"))
-            print("Language:", entry.get("language"))
 
             # Normalize headwords to always be a list
             raw_headwords = entry.get("headword", [])
@@ -61,16 +59,16 @@ class DictionaryReader:
             for hw in headwords:
                 word_text = hw.get("text", "")
                 word_pos = hw.get("pos", "")
-                
+
                 if word_pos not in grouped:
                     grouped[word_pos] = []
                 grouped[word_pos].append(word_text)
-
+            #if the words are not grouped
             for pos, words in grouped.items():
                 word_list = ", ".join(words)
-                print(f"🔤 Word(s): {word_list}")
+                print(f"\n🔤 Word(s): {word_list}")
                 print(f"📚 Part of Speech: {pos}\n")
-
+            #print out the definitions
             senses = entry.get("senses", [])
             if not senses:
                 print("No definitions found.")
@@ -78,4 +76,4 @@ class DictionaryReader:
                 for i, sense in enumerate(senses, 1):
                     definition = sense.get("definition")
                     if definition:
-                        print(f"{i}. {definition}")
+                        print(f"{i}. {definition}\n")
