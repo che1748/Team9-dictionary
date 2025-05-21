@@ -42,7 +42,8 @@ SUPPORTED_LANGUAGES = [
     {"code": "no", "name": "Norwegian"},
     {"code": "pl", "name": "Polish"},
     {"code": "br", "name": "Breton"},
-    {"code": "pt", "name": "Portuguese"},
+    {"code": "pt", "name": "Portuguese (Portugal)"},
+    {"code": "br", "name": "Portuguese(Brazil)"},
     {"code": "ru", "name": "Russian"},
     {"code": "sl", "name": "Slovenian"},
     {"code": "es", "name": "Spanish"},
@@ -63,24 +64,47 @@ def index():
             # Instantiate DictionaryReader and get data
             reader = DictionaryReader(search_word, selected_lang)
             raw_results = reader.get_entry()
-
             if raw_results:
                 results = []
                 for entry in raw_results:
-                    formatted_entry = {
-                        "word": entry.get("headword", {}).get("text", "N/A"),
-                        "pos": entry.get("headword", {}).get("pos", "N/A"),
-                        "definitions": []
-                    }
-                    senses = entry.get("senses", [])
-                    if senses:
-                        # Limiting to top 3 definitions as in your original data_reader
-                        for i, sense in enumerate(senses[:3], 1):
-                            definition = sense.get("definition", "No definition found")
-                            formatted_entry["definitions"].append(f"{i}. {definition}")
+                    if isinstance(entry, dict): # Keep this safety check for the main entry
+                        headword_data = entry.get("headword") # Get headword, no default here yet
+
+                        word_text = "N/A"
+                        pos_text = "N/A"
+
+                        if headword_data: # Check if headword_data exists at all
+                            if isinstance(headword_data, dict):
+                                # Case 1: headword is a dictionary (like for "word")
+                                word_text = headword_data.get("text", "N/A")
+                                pos_text = headword_data.get("pos", "N/A")
+                            elif isinstance(headword_data, list) and len(headword_data) > 0:
+                                # Case 2: headword is a list of dictionaries (like for "obrigado")
+                                first_headword = headword_data[0]
+                                if isinstance(first_headword, dict): # Ensure the first item is a dict
+                                    word_text = first_headword.get("text", "N/A")
+                                    pos_text = first_headword.get("pos", "N/A")
+                                else:
+                                    print(f"Warning: First headword item is not a dictionary: {first_headword}")
+                            else:
+                                print(f"Warning: Unexpected headword type or empty list: {headword_data} (Type: {type(headword_data)})")
+
+                        formatted_entry = {
+                            "word": word_text,
+                            "pos": pos_text,
+                            "definitions": []
+                        }
+                        senses = entry.get("senses", [])
+                        if senses:
+                            for i, sense in enumerate(senses[:3], 1):
+                                definition = sense.get("definition", "No definition found")
+                                formatted_entry["definitions"].append(f"{i}. {definition}")
+                        else:
+                            formatted_entry["definitions"].append("No definitions found for this entry.")
+                        results.append(formatted_entry)
                     else:
-                        formatted_entry["definitions"].append("No definitions found for this entry.")
-                    results.append(formatted_entry)
+                        print(f"Warning: Skipping unexpected item in API results: {entry} (Type: {type(entry)})")
+                        flash(f"Warning: Received unexpected data from API for '{search_word}'. Some results might be missing.", 'warning')
                 flash(f'Found results for "{search_word}" in {selected_lang}.', 'success')
             else:
                 flash(f'No results found for "{search_word}" in {selected_lang}.', 'info')
