@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multilingual Dictionary</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  
+</head>
+
+<body>
+    <main>
+        <form class="dictionary-form" action="#" method="GET">
+            <h2>Multilingual Dictionary Lookup</h2>
+
+            <div class="flash-messages">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            <label for="language">Select Language:</label>
+            <select name="language" id="language" required>
+                {% for lang in languages %}
+                    <option value="{{ lang.code }}" {% if lang.code == selected_lang %}selected{% endif %}>
+                        {{ lang.name }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <label for="word">Enter Word:</label>
+            <input type="text" id="word" name="word" placeholder="Enter a word..." value="{{ search_word }}" required />
+
+            <button type="submit">Search</button>
+        </form>
+
+        <div class="results-section">
+            {% if results %}
+                <h3>Results for "{{ search_word }}" in {{ selected_lang }}:</h3>
+                {% for entry in results %}
+                    <div class="word-entry">
+                        <h4>{{ entry.word }} ({{ entry.pos }})</h4>
+                        {% if entry.definitions %}
+                            <ul>
+                                {% for def in entry.definitions %}
+                                    <li>{{ def }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No definitions available for this entry.</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% elif search_word %}
+                <p class="no-results">No results found for "{{ search_word }}" in {{ selected_lang }}.</p>
+            {% else %}
+                <p class="no-results">Enter a word and select a language to search the dictionary.</p>
+            {% endif %}
+        </div>
+    </main>
+</body>
+
+</html>
