@@ -58,8 +58,14 @@ def index():
     results = None
     search_word = request.args.get('word', '').strip().lower() # Get word from URL query string
     selected_lang = request.args.get('language', 'en') # Get language from URL query string, default to 'en'
-
+    
     if search_word: # Only perform search if a word is provided
+        # Find the language name without using next
+        lang_name = "Unknown"
+        for lang in SUPPORTED_LANGUAGES:
+            if lang["code"] == selected_lang:
+                lang_name = lang["name"]
+            
         try:
             # Instantiate DictionaryReader and get data
             reader = DictionaryReader(search_word, selected_lang)
@@ -105,9 +111,9 @@ def index():
                     else:
                         print(f"Warning: Skipping unexpected item in API results: {entry} (Type: {type(entry)})")
                         flash(f"Warning: Received unexpected data from API for '{search_word}'. Some results might be missing.", 'warning')
-                flash(f'Found results for "{search_word}" in {selected_lang}.', 'success')
+                flash(f'Found results for "{search_word}" in {lang_name}.', 'success')
             else:
-                flash(f'No results found for "{search_word}" in {selected_lang}.', 'info')
+                flash(f'No results found for "{search_word}" in {lang_name}.', 'info')
 
         except ValueError as e:
             flash(f'Configuration Error: {e}. Please check your .env file.', 'danger')
@@ -118,7 +124,9 @@ def index():
                            languages=SUPPORTED_LANGUAGES,
                            search_word=search_word,
                            selected_lang=selected_lang,
-                           results=results)
+                           results=results,
+                           lang_name = lang_name
+                           )
 
 if __name__ == '__main__':
     app.run(debug=True)
