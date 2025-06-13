@@ -56,7 +56,7 @@ SUPPORTED_LANGUAGES = [
 @app.route('/', methods=['GET'])
 def index():
     results = None
-    search_word = request.args.get('word', '').strip() # Get word from URL query string
+    search_word = request.args.get('word', '').strip().lower() # Get word from URL query string
     selected_lang = request.args.get('language', 'en') # Get language from URL query string, default to 'en'
 
     if search_word: # Only perform search if a word is provided
