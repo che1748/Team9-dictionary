@@ -75,11 +75,11 @@ def index():
 
                         if headword_data: # Check if headword_data exists at all
                             if isinstance(headword_data, dict):
-                                # Case 1: headword is a dictionary (like for "word")
+                                # Case 1: headword is a dictionary 
                                 word_text = headword_data.get("text", "N/A")
                                 pos_text = headword_data.get("pos", "N/A")
                             elif isinstance(headword_data, list) and len(headword_data) > 0:
-                                # Case 2: headword is a list of dictionaries (like for "obrigado")
+                                # Case 2: headword is a list of dictionaries 
                                 first_headword = headword_data[0]
                                 if isinstance(first_headword, dict): # Ensure the first item is a dict
                                     word_text = first_headword.get("text", "N/A")
@@ -121,6 +121,4 @@ def index():
                            results=results)
 
 if __name__ == '__main__':
-    # Make sure to set FLASK_SECRET_KEY in your .env for flash messages to work
-    # and LEXICALA_API_KEY for DictionaryReader.
     app.run(debug=True)
