@@ -120,6 +120,16 @@ def index():
                            selected_lang=selected_lang,
                            results=results)
 
+@app.route('/notes')
+def show_notes():
+    import sqlite3
+    conn = sqlite3.connect('dic_note.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT word, notes, time created_at FROM note ORDER BY time")
+    notes = cursor.fetchall()
+    conn.close()
+    return render_template('notes.html', notes=notes)
+
 if __name__ == '__main__':
     # Make sure to set FLASK_SECRET_KEY in your .env for flash messages to work
     # and LEXICALA_API_KEY for DictionaryReader.
