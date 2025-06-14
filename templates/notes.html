@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dictionary Notes</title>
+    <style>
+        .note { 
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .word {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .date {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Your Dictionary Notes</h1>
+    
+    {% if notes %}
+        {% for word, note, timestamp in notes %}
+        <div class="note">
+            <div class="word">{{ word }}</div>
+            <div class="text">{{ note }}</div>
+            <div class="date">{{ timestamp }}</div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>No notes found.</p>
+    {% endif %}
+</body>
+</html>
