@@ -60,8 +60,8 @@ def index():
     selected_lang = request.args.get('language', 'en') # Get language from URL query string, default to 'en'
     
     if search_word: # Only perform search if a word is provided
-        # Find the language name without using next
-        lang_name = "Unknown"
+        # Find the language name
+        lang_name = ""
         for lang in SUPPORTED_LANGUAGES:
             if lang["code"] == selected_lang:
                 lang_name = lang["name"]
