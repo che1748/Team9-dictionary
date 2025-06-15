@@ -1,9 +1,12 @@
-# app.py
-from flask import Flask, render_template, request, flash
+
+from flask import Flask, render_template, request, flash, session, redirect
 from DictionaryReader import DictionaryReader # Assuming dictionary_reader.py is in the same directory
+from users import Users  # Make sure Users.py exists and defines the Users class
 import os
 from dotenv import load_dotenv
-
+import sqlite3
+from streakTracker import StreakTracker
+from db import initialize_db, get_connection
 load_dotenv()
 
 app = Flask(__name__)
@@ -58,15 +61,12 @@ def index():
     results = None
     search_word = request.args.get('word', '').strip().lower() # Get word from URL query string
     selected_lang = request.args.get('language', 'en') # Get language from URL query string, default to 'en'
-    
+    lang_name = "Unknown"
+    current_streak  = None
+    longest_streak = None
     if search_word: # Only perform search if a word is provided
-<<<<<<< HEAD
-        # Find the language name
-        lang_name = ""
-=======
-        # Find the language name without using next
-        lang_name = "Unknown"
->>>>>>> feature/new-feature
+
+        
         for lang in SUPPORTED_LANGUAGES:
             if lang["code"] == selected_lang:
                 lang_name = lang["name"]
@@ -126,25 +126,107 @@ def index():
             flash(f'An API error occurred: {e}', 'danger')
 
     return render_template('index.html',
-                           languages=SUPPORTED_LANGUAGES,
-                           search_word=search_word,
-                           selected_lang=selected_lang,
-                           results=results,
-                           lang_name = lang_name
-                           )
-<<<<<<< HEAD
-=======
+                       languages=SUPPORTED_LANGUAGES,
+                       search_word=search_word,
+                       selected_lang=selected_lang,
+                       results=results,
+                       lang_name=lang_name,
+                       current_streak=current_streak,
+                       longest_streak=longest_streak)
+
+
+@app.route('/register', methods=['GET'])
+def register_form():
+    return render_template('register.html')
+
+@app.route('/register', methods=['POST'])
+def register():
+    username = request.form['username']
+    password = request.form['password']
+
+    user = Users(username, password)
+    user.add_user()
+    user.close()
+
+    flash("✅ Registration successful! You can now log in.", "success")
+    return redirect('/login')
+
+@app.route('/login', methods=['GET'])
+def login_form():
+    return render_template('login.html')
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form['username']
+    password = request.form['password']
+
+    user = Users(username, password)
+    if user.verify_login():
+        session['username'] = username
+        flash("✅ Login successful!", "success")
+
+        # 🔥 Update streak here
+        streak = StreakTracker(username)
+        streak.update_streak()
+        streak.close()
+
+        user.close()
+        return redirect('/dashboard')
+    else:
+        flash("❌ Invalid username or password.", "danger")
+        user.close()
+        return redirect('/')
+
+
+@app.route('/dashboard')
+def dashboard():
+    """
+    Render the dashboard page for a logged-in user.
+
+    This function checks if a user is logged in by verifying the session.
+    If the user is logged in, it retrieves the user's current and longest streak
+    from the database and renders the dashboard page with this information.
+
+    Returns:
+        A redirect to the home page if the user is not logged in.
+        Otherwise, renders the 'dashboard.html' template with the username,
+        current streak, and longest streak.
+    """
+    if 'username' not in session:
+        return redirect('/')
+
+    username = session['username']
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT current_streak, longest_streak FROM users WHERE username = ?", (username,))
+    streak_data = cursor.fetchone()
+    conn.close()
+
+    return render_template('dashboard.html', username=username,
+                           current_streak=streak_data[0], longest_streak=streak_data[1])
+
+
+
 
 @app.route('/notes')
 def show_notes():
-    import sqlite3
+    
     conn = sqlite3.connect('dic_note.db')
     cursor = conn.cursor()
     cursor.execute("SELECT word, notes, time created_at FROM note ORDER BY time")
     notes = cursor.fetchall()
     conn.close()
     return render_template('notes.html', notes=notes)
->>>>>>> feature/new-feature
+
+
+
+
+
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,12 +1,14 @@
+import sqlite3
+from datetime import datetime
+
 def take_notes(word, notes):
     '''This functions takes a word and the related notes as input and store 
     the information in a local SQLite database. The table stores three pieces of information:
     the word, the note, and the time.
     '''
-    from datetime import datetime
+    
     current_timme = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    import sqlite3
     con = sqlite3.connect("dic_note.db")
     cur = con.cursor()
 
@@ -33,7 +35,6 @@ def take_notes(word, notes):
     con.close()
 
 def display_notes():
-    import sqlite3
     con = sqlite3.connect('dic_note.db')
     cur = con.cursor()
 
@@ -44,7 +45,6 @@ def display_notes():
     return notes
 
 def delete_note(word):
-    import sqlite3
     con = sqlite3.connect('dic_note.db')
     cur = con.cursor()
 
@@ -53,7 +53,6 @@ def delete_note(word):
     con.commit()
     con.close()
 
-import sqlite3
 
 def delete_all_notes():
     con = sqlite3.connect('dictionary.db')
