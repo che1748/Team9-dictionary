@@ -13,7 +13,7 @@ body {
   min-height: 100vh;
 }
 
-/* Navigation styling */
+/* Navbar */
 .navbar {
   background-color: #003366;
   color: white;
@@ -51,6 +51,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  position: relative;
 }
 
 .nav-form select,
@@ -60,6 +61,8 @@ body {
   border: none;
   font-size: 1rem;
   font-family: 'Poppins', sans-serif;
+  max-width: 400px;
+  width: 100%;
 }
 
 .nav-form input[type="text"] {
@@ -74,13 +77,16 @@ body {
 }
 
 .nav-form button {
-  position: relative;
-  left: -2.5rem;
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
   font-size: 1.2rem;
   color: #003366;
+  padding: 0;
 }
 
 .nav-form button:hover {
@@ -126,19 +132,14 @@ body {
   color: white;
 }
 
-/* Main content styling */
+/* Main content */
 main {
   display: flex;
   flex-wrap: wrap;
-  padding-top: 50px; /* adjust based on final navbar height */
+  padding-top: 50px;
   padding-left: 1rem;
   padding-right: 1rem;
   gap: 2rem;
-}
-@media (max-width: 768px) {
-  main {
-    padding-top: 260px; /* accounts for stacked logo + search box + nav-links */
-  }
 }
 
 main h2 {
@@ -148,9 +149,8 @@ main h2 {
   font-family: 'Poppins', sans-serif;
 }
 
-/* Sidebar styling */
+/* Sidebar */
 .sidebar {
-  
   width: 250px;
   display: flex;
   flex-direction: column;
@@ -166,7 +166,7 @@ main h2 {
   list-style: none;
 }
 
-/* Results styling */
+/* Content */
 .content-area {
   flex-grow: 1;
   background: white;
@@ -237,7 +237,7 @@ main h2 {
   border-radius: 8px;
   padding: 1rem;
   margin-bottom: 1rem;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .word-entry h4 {
@@ -273,7 +273,7 @@ main h2 {
   border-radius: 8px;
 }
 
-/* Mobile responsive adjustments */
+/* Mobile */
 @media (max-width: 768px) {
   .navbar {
     position: static;
@@ -294,16 +294,20 @@ main h2 {
 
   .nav-form {
     flex-direction: column;
-    width: 100%;
-    gap: 0.5rem;
+    align-items: center;
+    position: relative;
   }
 
   .nav-form select,
   .nav-form input[type="text"],
   .nav-form button {
     width: 90%;
-    margin: 0 auto;
-    left: 0;
+    max-width: 400px;
+    margin: 0.25rem 0;
+  }
+
+  .nav-form button {
+    right: 1rem;
   }
 
   .nav-links {
@@ -321,7 +325,7 @@ main h2 {
 
   main {
     flex-direction: column;
-    padding-top: 0;
+    padding-top: 260px;
   }
 
   .sidebar {
