@@ -2,5 +2,10 @@ services:
   - type: web
     name: multilingual-dictionary
     env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn flaskGUIMain:app"
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn flaskGUIMain:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_APP
+        value: flaskGUIMain.py
