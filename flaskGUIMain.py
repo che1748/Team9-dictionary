@@ -60,8 +60,13 @@ def index():
     selected_lang = request.args.get('language', 'en') # Get language from URL query string, default to 'en'
     
     if search_word: # Only perform search if a word is provided
+<<<<<<< HEAD
         # Find the language name
         lang_name = ""
+=======
+        # Find the language name without using next
+        lang_name = "Unknown"
+>>>>>>> feature/new-feature
         for lang in SUPPORTED_LANGUAGES:
             if lang["code"] == selected_lang:
                 lang_name = lang["name"]
@@ -127,6 +132,19 @@ def index():
                            results=results,
                            lang_name = lang_name
                            )
+<<<<<<< HEAD
+=======
+
+@app.route('/notes')
+def show_notes():
+    import sqlite3
+    conn = sqlite3.connect('dic_note.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT word, notes, time created_at FROM note ORDER BY time")
+    notes = cursor.fetchall()
+    conn.close()
+    return render_template('notes.html', notes=notes)
+>>>>>>> feature/new-feature
 
 if __name__ == '__main__':
     app.run(debug=True)
