@@ -34,7 +34,6 @@ pygame==2.6.1
 Pygments==2.19.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.0
-pywin32==310
 pyzmq==26.4.0
 requests==2.32.3
 six==1.17.0
