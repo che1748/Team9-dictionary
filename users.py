@@ -1,7 +1,8 @@
-
+import sqlite3
 from db import get_connection
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
+
 
 
 class Users:
@@ -19,9 +20,11 @@ class Users:
                 (self.username, hashed_pw, date.today().isoformat())
             )
             self.conn.commit()
-            print(f"✅ User '{self.username}' added to database.")
+        except sqlite3.IntegrityError:
+            print(f"❌ Username '{self.username}' already exists.")
         except Exception as e:
             print(f"⚠️ Could not add user '{self.username}': {e}")
+
 
     def verify_login(self):
         self.cursor.execute("SELECT password FROM users WHERE username = ?", (self.username,))
@@ -38,6 +41,15 @@ class Users:
         else:
             print("❌ Incorrect password.")
             return False
+
+    def update_last_active(self):
+        today = date.today().isoformat()
+        self.cursor.execute(
+            "UPDATE users SET last_active = ? WHERE username = ?",
+            (today, self.username)
+        )
+        self.conn.commit()
+        print(f"📅 Updated last_active for {self.username} to {today}")
 
 
     def close(self):

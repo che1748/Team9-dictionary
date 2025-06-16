@@ -12,6 +12,7 @@ load_dotenv()
 app = Flask(__name__)
 # It's crucial to set a secret key for Flask.
 # Use a strong, random key in production.
+initialize_db()
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "a_default_secret_key_if_not_set_in_env")
 
 # This list matches the options in your HTML's <select> element.

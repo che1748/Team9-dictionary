@@ -1,14 +1,20 @@
-import sqlite3
+# db.py
 
-DB_PATH = 'user_file.db'  # ✅ Updated name
+import sqlite3
+import os
+
+DB_PATH = 'user_file.db'  # ✅ Ensure this is the same path used across your app
 
 def get_connection():
+    """Returns a connection to the SQLite database."""
     return sqlite3.connect(DB_PATH)
 
 def initialize_db():
+    """Initializes the database with the required tables."""
     conn = get_connection()
     cursor = conn.cursor()
 
+    # Create users table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -21,6 +27,8 @@ def initialize_db():
         )
     ''')
 
+    # 
+
     conn.commit()
     conn.close()
-    print("✅ user_file.db initialized.")
+    print("✅ Database initialized successfully.")

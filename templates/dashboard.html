@@ -1,3 +1,4 @@
-<h2>🔥 Current Streak: {{ current_streak }} days</h2>
-<h3>🏆 Longest Streak: {{ longest_streak }} days</h3>
-
+<h2>Welcome, {{ username }}!</h2>
+<p>🔥 Current Streak: {{ current_streak }} days</p>
+<p>🏆 Longest Streak: {{ longest_streak }} days</p>
+<a href="{{ url_for('logout') }}">Logout</a>
