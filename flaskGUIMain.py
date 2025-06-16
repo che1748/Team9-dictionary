@@ -161,13 +161,15 @@ def login_form():
 def login():
     username = request.form['username']
     password = request.form['password']
+    print(f"🧪 Login attempt by: {username}")
 
     user = Users(username, password)
     if user.verify_login():
         session['username'] = username
+        print(f"✅ Session set for {username}")
         flash("✅ Login successful!", "success")
 
-        # 🔥 Update streak here
+        # Update streaks
         streak = StreakTracker(username)
         streak.update_streak()
         streak.close()
@@ -176,8 +178,10 @@ def login():
         return redirect('/dashboard')
     else:
         flash("❌ Invalid username or password.", "danger")
+        print("❌ Login failed")
         user.close()
         return redirect('/')
+
 
 
 @app.route('/dashboard')
