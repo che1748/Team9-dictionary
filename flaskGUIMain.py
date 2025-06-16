@@ -207,6 +207,11 @@ def dashboard():
     return render_template('dashboard.html', username=username,
                            current_streak=streak_data[0], longest_streak=streak_data[1])
 
+@app.route('/logout')
+def logout():
+    session.clear()  # or session.pop('username') if you want to keep other session keys
+    flash("🚪 You have been logged out.", "info")
+    return redirect('/')
 
 
 
