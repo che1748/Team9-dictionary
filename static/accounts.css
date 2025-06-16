@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@400;600&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: auto;
+}
+
+h2 {
+    padding-top: 2rem;
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    color: #003366;
+    margin-bottom: 0.5rem;
+}
+
+p {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+}
+
+a {
+    color: #003366;
+  font-family: 'Poppins', sans-serif;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.form-container {
+    margin: auto;
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+input, select {
+  font-family: 'Poppins', sans-serif;
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    margin-top: 1.5rem;
+    width: 100%;
+    background-color: #1e4f91;
+    color: white;
+    border: none;
+    padding: 0.8rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #003366;
+}
