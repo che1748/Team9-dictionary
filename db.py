@@ -1,21 +1,25 @@
-# db.py
-
 import sqlite3
 import os
 
-DB_PATH = 'user_file.db'  # ✅ Ensure this is the same path used across your app
+DB_PATH = 'user_file.db'
+LOOKUP_PATH = 'lookup_history.db'
 
-def get_connection():
-    """Returns a connection to the SQLite database."""
+def get_user_connection():
+    """Returns a connection to the user database."""
     return sqlite3.connect(DB_PATH)
 
-def initialize_db():
-    """Initializes the database with the required tables."""
-    conn = get_connection()
-    cursor = conn.cursor()
+def get_lookup_connection():
+    """Returns a connection to the lookup history database."""
+    return sqlite3.connect(LOOKUP_PATH)
 
-    # Create users table
-    cursor.execute('''
+def initialize_db():
+    """Initializes both databases with required tables."""
+
+    # Initialize users table
+    user_conn = get_user_connection()
+    user_cursor = user_conn.cursor()
+
+    user_cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
@@ -27,8 +31,24 @@ def initialize_db():
         )
     ''')
 
-    # 
+    user_conn.commit()
+    user_conn.close()
 
-    conn.commit()
-    conn.close()
-    print("✅ Database initialized successfully.")
+    # Initialize lookup_history table
+    lookup_conn = get_lookup_connection()
+    lookup_cursor = lookup_conn.cursor()
+
+    lookup_cursor.execute('''
+        CREATE TABLE IF NOT EXISTS lookup_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            word TEXT NOT NULL,
+            language_code TEXT NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    lookup_conn.commit()
+    lookup_conn.close()
+
+    print("✅ Databases initialized successfully.")

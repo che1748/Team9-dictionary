@@ -1,5 +1,5 @@
 import sqlite3
-from db import get_connection
+from db import get_user_connection
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -9,7 +9,7 @@ class Users:
     def __init__(self, username, password):
         self.username = username
         self.password = password
-        self.conn = get_connection()
+        self.conn = get_user_connection()
         self.cursor = self.conn.cursor()
 
     def add_user(self):

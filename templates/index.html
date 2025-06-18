@@ -2,107 +2,129 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multilingual Dictionary</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multilingual Dictionary</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 </head>
 
 <body>
-    <nav class="navbar">
-  <div class="nav-container">
+  <nav class="navbar">
+    <div class="nav-container">
 
-    <!-- LEFT: Logo -->
-    <div class="nav-left">
-      <img src="{{ url_for('static', filename='images/logo-dark.png') }}" alt="Logo" class="logo">
+      <!-- LEFT: Logo -->
+      <div class="nav-left">
+        <img src="{{ url_for('static', filename='images/logo-dark.png') }}" alt="Logo" class="logo">
+      </div>
+
+      <!-- CENTER: Language & Search -->
+      <div class="nav-center">
+        <form class="nav-form" action="#" method="GET">
+          <select name="language" id="language" required>
+            {% for lang in languages %}
+            <option value="{{ lang.code }}" {% if lang.code==selected_lang %}selected{% endif %}>
+              {{ lang.name }}
+            </option>
+            {% endfor %}
+          </select>
+          <input type="text" id="word" name="word" placeholder="Enter a word..." value="{{ search_word }}" required>
+          <button type="submit">
+            <span class="material-symbols-outlined">search</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- RIGHT: Nav Links and Auth -->
+      <div class="nav-right">
+        <ul class="nav-links">
+          <li><a href="#examples">Examples</a></li>
+          <li><a href="#pronunciations">Pronunciations</a></li>
+        </ul>
+        <div class="auth-links">
+          <a href="/login">Login</a>
+          <span>|</span>
+          <a href="/register">Register</a>
+        </div>
+      </div>
+
     </div>
+  </nav>
 
-    <!-- CENTER: Language & Search -->
-    <div class="nav-center">
-      <form class="nav-form" action="#" method="GET">
-        <select name="language" id="language" required>
-          {% for lang in languages %}
-          <option value="{{ lang.code }}" {% if lang.code==selected_lang %}selected{% endif %}>
-            {{ lang.name }}
-          </option>
+  <main>
+    <div class="main-container" style="display: flex;">
+      <div class="sidebar">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="#">Favorites</a></li>
+          <li><a href="#">Recent Searches</a></li>
+        </ul>
+
+        {% if username %}
+        <div class="user-info">
+          <h2>Welcome, {{ username }}!</h2>
+          <p>🔥 Current Streak: {{ current_streak }} days</p>
+          <p>🏆 Longest Streak: {{ longest_streak }} days</p>
+          <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+        
+        <h3>Recent Lookups</h3>
+        <ul>
+          {% for word, lang, time in recent_lookups %}
+          <li>{{ word }} ({{ lang }}) - {{ time }}</li>
           {% endfor %}
-        </select>
-        <input type="text" id="word" name="word" placeholder="Enter a word..." value="{{ search_word }}" required>
-        <button type="submit">
-          <span class="material-symbols-outlined">search</span>
-        </button>
-      </form>
-    </div>
+        </ul>
+        {% endif %}
 
-    <!-- RIGHT: Nav Links and Auth -->
-    <div class="nav-right">
-      <ul class="nav-links">
-        <li><a href="#examples">Examples</a></li>
-        <li><a href="#pronunciations">Pronunciations</a></li>
-      </ul>
-      <div class="auth-links">
-        <a href="/login">Login</a>
-        <span>|</span>
-        <a href="/register">Register</a>
+        <div class="content-area">
+          <!-- All your result content goes here -->
+          <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" width="150">
+        </div>
+      </div>
+
+      <div class="results">
+        <div class="flash-messages">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+          {% for category, message in messages %}
+          <div class="{{ category }}">{{ message }}</div>
+          {% endfor %}
+          {% endif %}
+          {% endwith %}
+        </div>
+
+        <h2>Multi-Lingual Dictionary Lookup</h2>
+
+        <div class="results-section">
+          {% if results %}
+          <h3>Results for "{{ search_word }}" in {{ lang_name }}:</h3>
+          {% for entry in results %}
+          <div class="word-entry">
+            <h4>{{ entry.word }} ({{ entry.pos }})</h4>
+            {% if entry.definitions %}
+            <ul>
+              {% for def in entry.definitions %}
+              <li>{{ def }}</li>
+              {% endfor %}
+            </ul>
+            {% else %}
+            <p>No definitions available for this entry.</p>
+            {% endif %}
+          </div>
+          {% endfor %}
+          {% elif search_word %}
+          <p class="no-results">No results found for "{{ search_word }}" in {{ lang_name }}.</p>
+          {% else %}
+          <p class="no-results">Enter a word and select a language to search the dictionary.</p>
+          {% endif %}
+        </div>
       </div>
     </div>
+  </main>
 
-  </div>
-</nav>
-
-    <main>
-        <div class="sidebar">
-            <h3>Quick Links</h3>
-            <ul>
-                <li><a href="#">Favorites</a></li>
-                <li><a href="#">Recent Searches</a></li>
-            </ul>
-            <div class="content-area">
-                <!-- All your result content goes here -->
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" width="150">
-            </div>
-        </div>
-        <div class="results">
-            <div class="flash-messages">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                {% for category, message in messages %}
-                <div class="{{ category }}">{{ message }}</div>
-                {% endfor %}
-                {% endif %}
-                {% endwith %}
-            </div>
-
-            <h2>Multi-Lingual Dictionary Lookup</h2>
-            <div class="results-section">
-                {% if results %}
-                <h3>Results for "{{ search_word }}" in {{ lang_name }}:</h3>
-                {% for entry in results %}
-                <div class="word-entry">
-                    <h4>{{ entry.word }} ({{ entry.pos }})</h4>
-                    {% if entry.definitions %}
-                    <ul>
-                        {% for def in entry.definitions %}
-                        <li>{{ def }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <p>No definitions available for this entry.</p>
-                    {% endif %}
-                </div>
-                {% endfor %}
-                {% elif search_word %}
-                <p class="no-results">No results found for "{{ search_word }}" in {{ lang_name }}.</p>
-                {% else %}
-                <p class="no-results">Enter a word and select a language to search the dictionary.</p>
-                {% endif %}
-            </div>
-        </div>
-    </main>
 </body>
 
 </html>

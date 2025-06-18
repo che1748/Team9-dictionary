@@ -6,7 +6,8 @@ import os
 from dotenv import load_dotenv
 import sqlite3
 from streakTracker import StreakTracker
-from db import initialize_db, get_connection
+from db import initialize_db, get_user_connection
+from lookup_history import LookupHistory
 load_dotenv()
 
 app = Flask(__name__)
@@ -59,53 +60,64 @@ SUPPORTED_LANGUAGES = [
 
 @app.route('/', methods=['GET'])
 def index():
-    results = None
-    search_word = request.args.get('word', '').strip().lower() # Get word from URL query string
-    selected_lang = request.args.get('language', 'en') # Get language from URL query string, default to 'en'
-    lang_name = "Unknown"
-    current_streak  = None
+    username = session.get('username')
+    
+    current_streak = None
     longest_streak = None
-    if search_word: # Only perform search if a word is provided
+    recent_lookups = []
 
-        
+    if username:
+        conn = get_user_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT current_streak, longest_streak FROM users WHERE username = ?", (username,))
+        streak_data = cursor.fetchone()
+        conn.close()
+        if streak_data:
+            current_streak, longest_streak = streak_data
+        history = LookupHistory(username)
+        recent_raw = history.get_recent_history(limit=10)
+        recent_lookups = [
+        (word, next((lang['name'] for lang in SUPPORTED_LANGUAGES if lang['code'] == code), code), timestamp)
+        for word, code, timestamp in recent_raw]
+
+        history.close
+    results = []
+    search_word = request.args.get('word', '').strip().lower()
+    selected_lang = request.args.get('language', 'en')
+    lang_name = " "
+
+    if search_word:
         for lang in SUPPORTED_LANGUAGES:
             if lang["code"] == selected_lang:
                 lang_name = lang["name"]
-            
+
         try:
-            # Instantiate DictionaryReader and get data
             reader = DictionaryReader(search_word, selected_lang)
             raw_results = reader.get_entry()
             if raw_results:
                 results = []
                 for entry in raw_results:
-                    if isinstance(entry, dict): # Keep this safety check for the main entry
-                        headword_data = entry.get("headword") # Get headword, no default here yet
-
+                    if isinstance(entry, dict):
+                        headword_data = entry.get("headword")
                         word_text = "N/A"
                         pos_text = "N/A"
 
-                        if headword_data: # Check if headword_data exists at all
+                        if headword_data:
                             if isinstance(headword_data, dict):
-                                # Case 1: headword is a dictionary 
                                 word_text = headword_data.get("text", "N/A")
                                 pos_text = headword_data.get("pos", "N/A")
                             elif isinstance(headword_data, list) and len(headword_data) > 0:
-                                # Case 2: headword is a list of dictionaries 
                                 first_headword = headword_data[0]
-                                if isinstance(first_headword, dict): # Ensure the first item is a dict
+                                if isinstance(first_headword, dict):
                                     word_text = first_headword.get("text", "N/A")
                                     pos_text = first_headword.get("pos", "N/A")
-                                else:
-                                    print(f"Warning: First headword item is not a dictionary: {first_headword}")
-                            else:
-                                print(f"Warning: Unexpected headword type or empty list: {headword_data} (Type: {type(headword_data)})")
 
                         formatted_entry = {
                             "word": word_text,
                             "pos": pos_text,
                             "definitions": []
                         }
+
                         senses = entry.get("senses", [])
                         if senses:
                             for i, sense in enumerate(senses[:3], 1):
@@ -113,13 +125,21 @@ def index():
                                 formatted_entry["definitions"].append(f"{i}. {definition}")
                         else:
                             formatted_entry["definitions"].append("No definitions found for this entry.")
+
                         results.append(formatted_entry)
                     else:
-                        print(f"Warning: Skipping unexpected item in API results: {entry} (Type: {type(entry)})")
-                        flash(f"Warning: Received unexpected data from API for '{search_word}'. Some results might be missing.", 'warning')
+                        flash(f"Warning: Received unexpected data from API for '{search_word}'.", 'warning')
+
                 flash(f'Found results for "{search_word}" in {lang_name}.', 'success')
+                
+                if username and search_word and raw_results:
+                    history = LookupHistory(username)
+                    history.log_search(search_word, selected_lang)
+                    history.close()
+
             else:
                 flash(f'No results found for "{search_word}" in {lang_name}.', 'info')
+            
 
         except ValueError as e:
             flash(f'Configuration Error: {e}. Please check your .env file.', 'danger')
@@ -127,13 +147,17 @@ def index():
             flash(f'An API error occurred: {e}', 'danger')
 
     return render_template('index.html',
-                       languages=SUPPORTED_LANGUAGES,
-                       search_word=search_word,
-                       selected_lang=selected_lang,
-                       results=results,
-                       lang_name=lang_name,
-                       current_streak=current_streak,
-                       longest_streak=longest_streak)
+                           username=username,
+                           current_streak=current_streak,
+                           longest_streak=longest_streak,
+                           languages=SUPPORTED_LANGUAGES,
+                           search_word=search_word,
+                           selected_lang=selected_lang,
+                           results=results,
+                           lang_name=lang_name,
+                           recent_lookups=recent_lookups
+                           )
+
 
 
 @app.route('/register', methods=['GET'])
@@ -142,8 +166,8 @@ def register_form():
 
 @app.route('/register', methods=['POST'])
 def register():
-    username = request.form['username']
-    password = request.form['password']
+    username = request.form('username').strip()
+    password = request.form('password')
 
     user = Users(username, password)
     user.add_user()
@@ -159,57 +183,38 @@ def login_form():
 
 @app.route('/login', methods=['POST'])
 def login():
-    username = request.form['username']
-    password = request.form['password']
+    username = request.form.get('username').strip()
+    password = request.form.get('password')
+
     print(f"🧪 Login attempt by: {username}")
 
+    # Sanity check
+    if not username or not password:
+        flash("⚠️ Username and password are required.", "warning")
+        return redirect('/login')
+
     user = Users(username, password)
+
     if user.verify_login():
         session['username'] = username
         print(f"✅ Session set for {username}")
         flash("✅ Login successful!", "success")
 
-        # Update streaks
+        # Handle streak tracking
         streak = StreakTracker(username)
         streak.update_streak()
         streak.close()
 
         user.close()
-        return redirect('/dashboard')
+        return redirect('/')
     else:
         flash("❌ Invalid username or password.", "danger")
         print("❌ Login failed")
         user.close()
-        return redirect('/')
+        return redirect('/login')
 
 
 
-@app.route('/dashboard')
-def dashboard():
-    """
-    Render the dashboard page for a logged-in user.
-
-    This function checks if a user is logged in by verifying the session.
-    If the user is logged in, it retrieves the user's current and longest streak
-    from the database and renders the dashboard page with this information.
-
-    Returns:
-        A redirect to the home page if the user is not logged in.
-        Otherwise, renders the 'dashboard.html' template with the username,
-        current streak, and longest streak.
-    """
-    if 'username' not in session:
-        return redirect('/')
-
-    username = session['username']
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT current_streak, longest_streak FROM users WHERE username = ?", (username,))
-    streak_data = cursor.fetchone()
-    conn.close()
-
-    return render_template('dashboard.html', username=username,
-                           current_streak=streak_data[0], longest_streak=streak_data[1])
 
 @app.route('/logout')
 def logout():
