@@ -177,11 +177,12 @@ main h2 {
 
 .results {
   padding: 2rem;
-  margin: 2rem auto;
+  margin: 0 auto;
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
+
 
 .flash-messages {
   margin-bottom: 1rem;
@@ -325,8 +326,14 @@ main h2 {
 
   main {
     flex-direction: column;
-    padding-top: 260px;
+    padding-top: 2rem;
   }
+
+  .nav-left .logo {
+    width: 150px;
+    height: 40px;
+    display: inline;
+}
 
   .sidebar {
     width: 100%;

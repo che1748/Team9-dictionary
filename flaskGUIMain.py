@@ -138,7 +138,7 @@ def index():
                     history.close()
 
             else:
-                flash(f'No results found for "{search_word}" in {lang_name}.', 'info')
+                flash(f'No results found for "{search_word.upper()}" in {lang_name}.', 'info')
             
 
         except ValueError as e:
