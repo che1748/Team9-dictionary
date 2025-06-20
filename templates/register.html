@@ -1,33 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Register</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='accounts.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='accounts.css') }}">
 </head>
+
 <body>
-    <h2>Register</h2>
+  <nav class="navbar">
+    <div class="nav-container">
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="flash">
-          {% for category, message in messages %}
-            <p class="{{ category }}">{{ message }}</p>
-          {% endfor %}
+      <!-- LEFT: Logo -->
+      <div class="nav-left">
+        <a href="{{ url_for('index') }}">
+          <img src="{{ url_for('static', filename='images/logo-dark.png') }}" alt="Logo" class="logo">
+        </a>
+      </div>
+      <!-- CENTER: Language & Search -->
+      <div class="nav-center">
+        <form class="nav-form" action="#" method="GET">
+          <label for="language" class="visually-hidden">Select language</label>
+          <select name="language" id="language" required>
+            {% for lang in languages %}
+            <option value="{{ lang.code }}" {% if lang.code==selected_lang %}selected{% endif %}>
+              {{ lang.name }}
+            </option>
+            {% endfor %}
+          </select>
+          <input type="text" id="word" name="word" placeholder="Enter a word..." value="{{ search_word }}" required>
+          <button type="submit">
+            <span class="material-symbols-outlined">search</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- RIGHT: Nav Links and Auth -->
+      <div class="nav-right">
+        <ul class="nav-links">
+          <li><a href="#examples">Examples</a></li>
+          <li><a href="#pronunciations">Pronunciations</a></li>
+        </ul>
+        <div class="auth-links">
+          <a href="/login">Login</a>
+          <span>|</span>
+          <a href="/register">Register</a>
         </div>
-      {% endif %}
-    {% endwith %}
+      </div>
 
-    <form action="/register" method="POST" class="form-container">
-        <label for="username">Username:</label><br>
-        <input type="text" name="username" required><br><br>
+    </div>
+  </nav>
 
-        <label for="password">Password:</label><br>
-        <input type="password" name="password" required><br><br>
+  <h2>Register</h2>
 
-        <button type="submit">Register</button>
-    </form>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash">
+    {% for category, message in messages %}
+    <p class="{{ category }}">{{ message }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
 
-    <p>Already have an account? <a href="/login">Log in here</a></p>
+  <form action="/register" method="POST" class="form-container">
+    <label for="username">Username:</label><br>
+    <input type="text" name="username" required placeholder="Enter your username" title="Username"><br><br>
+
+    <label for="password">Password:</label><br>
+    <input type="password" name="password" required placeholder="Enter your password" title="Password"><br><br>
+
+    <button type="submit">Register</button>
+  </form>
+
+  <p>Already have an account? <a href="/login">Log in here</a></p>
 </body>
+
 </html>

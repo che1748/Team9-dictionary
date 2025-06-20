@@ -1,11 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@400;600&display=swap');
 
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     font-family: 'Inter', sans-serif;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    margin: auto;
 }
 
 h2 {
@@ -25,7 +31,7 @@ p {
 
 a {
     color: #003366;
-  font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', sans-serif;
     text-decoration: none;
     font-weight: 500;
 }
@@ -47,8 +53,9 @@ label {
     letter-spacing: 1px;
 }
 
-input, select {
-  font-family: 'Poppins', sans-serif;
+input,
+select {
+    font-family: 'Poppins', sans-serif;
     width: 100%;
     padding: 10px;
     font-size: 1rem;
@@ -72,4 +79,124 @@ button {
 
 button:hover {
     background-color: #003366;
+}
+
+/* nav bar */
+
+.navbar {
+    background-color: #003366;
+    color: white;
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    gap: 1rem;
+}
+
+.nav-left .logo {
+    width: 150px;
+    height: 40px;
+    display: block;
+}
+
+.nav-center {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.nav-form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+}
+
+.nav-form select,
+.nav-form input[type="text"] {
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: none;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    max-width: 400px;
+    width: 100%;
+}
+
+.nav-form input[type="text"] {
+    outline: none;
+    padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+    transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.nav-form input[type="text"]:focus,
+.nav-form select:focus {
+    box-shadow: 0 0 0 3px #007bff;
+}
+
+.nav-form button {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #003366;
+    padding: 0;
+}
+
+.nav-form button:hover {
+    color: #007bff;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+}
+
+.nav-links a,
+.sidebar a,
+.auth-links a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+    font-family: 'Poppins', sans-serif;
+}
+
+.nav-links a:hover,
+.sidebar a:hover,
+.auth-links a:hover {
+    color: #aad8ff;
+}
+
+.auth-links {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 14px;
+}
+
+.auth-links a:visited {
+    color: white;
 }

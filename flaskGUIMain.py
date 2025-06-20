@@ -80,7 +80,7 @@ def index():
         (word, next((lang['name'] for lang in SUPPORTED_LANGUAGES if lang['code'] == code), code), timestamp)
         for word, code, timestamp in recent_raw]
 
-        history.close
+        history.close()
     results = []
     search_word = request.args.get('word', '').strip().lower()
     selected_lang = request.args.get('language', 'en')
@@ -166,8 +166,8 @@ def register_form():
 
 @app.route('/register', methods=['POST'])
 def register():
-    username = request.form('username').strip()
-    password = request.form('password')
+    username = request.form.get('username', '').strip()
+    password = request.form.get('password', '')
 
     user = Users(username, password)
     user.add_user()
@@ -183,8 +183,10 @@ def login_form():
 
 @app.route('/login', methods=['POST'])
 def login():
-    username = request.form.get('username').strip()
+    username = request.form.get('username')
     password = request.form.get('password')
+    if username:
+        username = username.strip()
 
     print(f"🧪 Login attempt by: {username}")
 
@@ -218,7 +220,7 @@ def login():
 
 @app.route('/logout')
 def logout():
-    session.clear()  # or session.pop('username') if you want to keep other session keys
+    session.pop('username', None)  # Remove only the username from session
     flash("🚪 You have been logged out.", "info")
     return redirect('/')
 
@@ -226,10 +228,18 @@ def logout():
 
 @app.route('/notes')
 def show_notes():
-    
     conn = sqlite3.connect('dic_note.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT word, notes, time created_at FROM note ORDER BY time")
+    # Ensure the 'note' table exists
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS note (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            word TEXT NOT NULL,
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    cursor.execute("SELECT word, notes, created_at FROM note ORDER BY created_at")
     notes = cursor.fetchall()
     conn.close()
     return render_template('notes.html', notes=notes)

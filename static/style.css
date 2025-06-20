@@ -329,10 +329,10 @@ main h2 {
     padding-top: 2rem;
   }
 
-  .nav-left .logo {
-    width: 150px;
-    height: 40px;
-    display: inline;
+.nav-left .logo {
+  width: 150px;
+  height: 40px;
+  display: inline;
 }
 
   .sidebar {

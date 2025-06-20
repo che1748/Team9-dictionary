@@ -3,7 +3,6 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Multilingual Dictionary</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link rel="stylesheet"
@@ -18,12 +17,15 @@
 
       <!-- LEFT: Logo -->
       <div class="nav-left">
-        <img src="{{ url_for('static', filename='images/logo-dark.png') }}" alt="Logo" class="logo">
+        <a href="{{ url_for('index') }}">
+          <img src="{{ url_for('static', filename='images/logo-dark.png') }}" alt="Logo" class="logo">
+        </a>
       </div>
 
       <!-- CENTER: Language & Search -->
       <div class="nav-center">
         <form class="nav-form" action="#" method="GET">
+          <label for="language" class="visually-hidden">Select language</label>
           <select name="language" id="language" required>
             {% for lang in languages %}
             <option value="{{ lang.code }}" {% if lang.code==selected_lang %}selected{% endif %}>
@@ -56,72 +58,74 @@
 
   <main>
 
-      <div class="sidebar">
-        <h3>Quick Links</h3>
-        <ul>
-          <li><a href="#">Favorites</a></li>
-          <li><a href="#">Recent Searches</a></li>
-        </ul>
+    <div class="sidebar">
+      <h3>Quick Links</h3>
+      <ul>
+        <li><a href="#">Favorites</a></li>
+        <li><a href="#">Recent Searches</a></li>
+      </ul>
 
-        {% if username %}
-        <div class="user-info">
-          <h2>Welcome, {{ username }}!</h2>
-          <p>🔥 Current Streak: {{ current_streak }} days</p>
-          <p>🏆 Longest Streak: {{ longest_streak }} days</p>
-          <a href="{{ url_for('logout') }}">Logout</a>
-        </div>
-        
-        <h3>Recent Lookups</h3>
-        <ul>
-          {% for word, lang, time in recent_lookups %}
-          <li>{{ word }} ({{ lang }}) - {{ time }}</li>
-          {% endfor %}
-        </ul>
+      {% if username %}
+      <div class="user-info">
+        <h2>Welcome, {{ username }}!</h2>
+        <p>🔥 Current Streak: {{ current_streak }} days</p>
+        <p>🏆 Longest Streak: {{ longest_streak }} days</p>
+        <a href="{{ url_for('logout') }}">Logout</a>
+      </div>
+
+      <div class="content-area">
+        <!-- All your result content goes here -->
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" width="150">
+      </div>
+
+      <div class="recent-lookups-header">
+        <h3>Recent Lookups</h3> <a href="">Clear Data</a>
+      </div>
+      <ol class="recent-lookups">
+        {% for lookup in recent_lookups %}
+        <li>{{ lookup[0] }} ({{ lookup[1] }}) - {{ lookup[2] }}</li>
+        {% endfor %}
+      </ol>
+      {% endif %}
+    </div>
+
+    <div class="results">
+      <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
         {% endif %}
-
-        <div class="content-area">
-          <!-- All your result content goes here -->
-          <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" width="150">
-        </div>
+        {% endwith %}
       </div>
 
-      <div class="results">
-        <div class="flash-messages">
-          {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-          {% for category, message in messages %}
-          <div class="{{ category }}">{{ message }}</div>
-          {% endfor %}
-          {% endif %}
-          {% endwith %}
-        </div>
+      <h2>Multi-Lingual Dictionary Lookup</h2>
 
-        <h2>Multi-Lingual Dictionary Lookup</h2>
-
-        <div class="results-section">
-          {% if results %}
-          <h3>Results for "{{ search_word }}" in {{ lang_name }}:</h3>
-          {% for entry in results %}
-          <div class="word-entry">
-            <h4>{{ entry.word }} ({{ entry.pos }})</h4>
-            {% if entry.definitions %}
-            <ul>
-              {% for def in entry.definitions %}
+      <div class="results-section">
+        {% if results %}
+        <h3>Results for "{{ search_word }}" in {{ lang_name }}:</h3>
+        {% for entry in results %}
+        <div class="word-entry">
+          <h4>{{ entry.word }} ({{ entry.pos }})</h4>
+          {% if entry.definitions %}
+          <ul>
+          <ul>
+            {% for def in entry.definitions %}
               <li>{{ def }}</li>
-              {% endfor %}
-            </ul>
-            {% else %}
-            <p>No definitions available for this entry.</p>
-            {% endif %}
-          </div>
-          {% endfor %}
-          {% elif search_word %}
-          <p class="no-results">No results found for "{{ search_word }}" in {{ lang_name }}.</p>
-          {% else %}
-          <p class="no-results">Enter a word and select a language to search the dictionary.</p>
+            {% endfor %}
+          </ul>
+          <p>No definitions available for this entry.</p>
           {% endif %}
         </div>
+        {% endfor %}
+        {% elif search_word %}
+        <p class="no-results">No results found for "{{ search_word }}" in {{ lang_name }}.</p>
+        {% else %}
+        <p class="no-results">Enter a word and select a language to search the dictionary.</p>
+        {% endif %}
       </div>
+    </div>
 
   </main>
 

@@ -35,6 +35,10 @@ class StreakTracker:
         elif last_date == today - timedelta(days=1):
             current_streak += 1
             print("🔥 Streak continued!")
+        elif last_date is None:
+            current_streak = 1
+            longest_streak = 1
+            print("🆕 First activity! Streak started at 1")
         else:
             current_streak = 1
             print("🔄 Streak reset to 1")

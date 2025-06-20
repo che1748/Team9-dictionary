@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dictionary Notes</title>
     <style>
         .note { 
@@ -23,7 +25,7 @@
     <h1>Your Dictionary Notes</h1>
     
     {% if notes %}
-        {% for word, note, timestamp in notes %}
+        {% for (word, note, timestamp) in notes %}
         <div class="note">
             <div class="word">{{ word }}</div>
             <div class="text">{{ note }}</div>
