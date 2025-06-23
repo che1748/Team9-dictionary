@@ -1,14 +1,14 @@
 from db import get_user_connection
-
 from datetime import date, timedelta
 
 class StreakTracker:
     def __init__(self, username):
         self.username = username
-        self.conn = get_user_connection()
+        self.conn = get_user_connection(self.username)
         self.cursor = self.conn.cursor()
 
     def update_streak(self):
+        """Update user's login streak."""
         self.cursor.execute(
             "SELECT current_streak, longest_streak, last_active FROM users WHERE username = ?",
             (self.username,)
@@ -22,8 +22,15 @@ class StreakTracker:
         current_streak, longest_streak, last_active = row
         today = date.today()
 
+        # Convert last_active to date object if needed
         if last_active:
-            last_date = date.fromisoformat(last_active)
+            if isinstance(last_active, date):
+                last_date = last_active
+            else:
+                try:
+                    last_date = date.fromisoformat(str(last_active))
+                except (ValueError, TypeError):
+                    raise ValueError(f"⚠️ Invalid last_active date for user '{self.username}': {last_active}")
         else:
             last_date = None
 
@@ -35,14 +42,13 @@ class StreakTracker:
         elif last_date == today - timedelta(days=1):
             current_streak += 1
             print("🔥 Streak continued!")
-        elif last_date is None:
-            current_streak = 1
-            longest_streak = 1
-            print("🆕 First activity! Streak started at 1")
         else:
+            if current_streak > longest_streak:
+                longest_streak = current_streak
             current_streak = 1
             print("🔄 Streak reset to 1")
 
+        # Ensure longest streak is updated
         if current_streak > longest_streak:
             longest_streak = current_streak
 
@@ -57,3 +63,4 @@ class StreakTracker:
 
     def close(self):
         self.conn.close()
+        print("🛑 Database connection closed.")

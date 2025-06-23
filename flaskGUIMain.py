@@ -1,5 +1,5 @@
 
-from flask import Flask, render_template, request, flash, session, redirect
+from flask import Flask, render_template, request, flash, session, redirect, url_for
 from DictionaryReader import DictionaryReader # Assuming dictionary_reader.py is in the same directory
 from users import Users  # Make sure Users.py exists and defines the Users class
 import os
@@ -65,6 +65,7 @@ def index():
     current_streak = None
     longest_streak = None
     recent_lookups = []
+    delete_history = None
 
     if username:
         conn = get_user_connection()
@@ -136,6 +137,10 @@ def index():
                     history = LookupHistory(username)
                     history.log_search(search_word, selected_lang)
                     history.close()
+                elif username and search_word:
+                    delete_history = LookupHistory(username)
+                    delete_history.clear_history(search_word, selected_lang)
+                    delete_history.close()
 
             else:
                 flash(f'No results found for "{search_word.upper()}" in {lang_name}.', 'info')
@@ -155,7 +160,8 @@ def index():
                            selected_lang=selected_lang,
                            results=results,
                            lang_name=lang_name,
-                           recent_lookups=recent_lookups
+                           recent_lookups=recent_lookups,
+                           delete_history=delete_history
                            )
 
 
@@ -170,11 +176,17 @@ def register():
     password = request.form.get('password', '')
 
     user = Users(username, password)
-    user.add_user()
+    success = user.add_user()
     user.close()
 
-    flash("✅ Registration successful! You can now log in.", "success")
-    return redirect('/login')
+    if success:
+        flash("✅ Registration successful! You can now log in.", "success")
+        return redirect('/login')
+    else:
+        flash("❌ Registration failed. Username may already exist.", "danger")
+        return redirect('/register')
+
+
 
 @app.route('/login', methods=['GET'])
 def login_form():
@@ -185,12 +197,14 @@ def login_form():
 def login():
     username = request.form.get('username')
     password = request.form.get('password')
+
     if username:
         username = username.strip()
+    if password:
+        password = password.strip()
 
     print(f"🧪 Login attempt by: {username}")
 
-    # Sanity check
     if not username or not password:
         flash("⚠️ Username and password are required.", "warning")
         return redirect('/login')
@@ -199,15 +213,16 @@ def login():
 
     if user.verify_login():
         session['username'] = username
-        print(f"✅ Session set for {username}")
         flash("✅ Login successful!", "success")
+        print(f"✅ Session set for {username}")
 
-        # Handle streak tracking
-        streak = StreakTracker(username)
-        streak.update_streak()
-        streak.close()
+        try:
+            streak = StreakTracker(username)
+            streak.update_streak()
+        finally:
+            streak.close()
+            user.close()
 
-        user.close()
         return redirect('/')
     else:
         flash("❌ Invalid username or password.", "danger")
@@ -215,6 +230,16 @@ def login():
         user.close()
         return redirect('/login')
 
+
+@app.route('/clear')
+def clear_lookup_history():
+    username = session.get('username')
+    if username:
+        history = LookupHistory(username)
+        history.clear_all_history()
+        history.close()
+        flash("Your lookup history has been cleared.")
+    return redirect(url_for('index'))  
 
 
 

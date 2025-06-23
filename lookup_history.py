@@ -23,6 +23,15 @@ class LookupHistory:
         )
         return self.cursor.fetchall()
 
+    def clear_all_history(self):
+        self.cursor.execute(
+            "DELETE FROM lookup_history WHERE username = ?",
+            (self.username,)
+        )
+        self.conn.commit()
+        print(f"🗑️ All history cleared for user '{self.username}'.")
+
+
     def close(self):
         self.conn.close()
         print("🛑 Database connection closed.")
