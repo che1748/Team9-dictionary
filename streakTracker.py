@@ -1,5 +1,5 @@
-from db import get_user_connection
 from datetime import date, timedelta
+from db import get_user_connection
 
 class StreakTracker:
     def __init__(self, username):
@@ -8,7 +8,6 @@ class StreakTracker:
         self.cursor = self.conn.cursor()
 
     def update_streak(self):
-        """Update user's login streak."""
         self.cursor.execute(
             "SELECT current_streak, longest_streak, last_active FROM users WHERE username = ?",
             (self.username,)
@@ -22,15 +21,12 @@ class StreakTracker:
         current_streak, longest_streak, last_active = row
         today = date.today()
 
-        # Convert last_active to date object if needed
         if last_active:
-            if isinstance(last_active, date):
-                last_date = last_active
-            else:
-                try:
-                    last_date = date.fromisoformat(str(last_active))
-                except (ValueError, TypeError):
-                    raise ValueError(f"⚠️ Invalid last_active date for user '{self.username}': {last_active}")
+            try:
+                last_date = date.fromisoformat(str(last_active))
+            except (ValueError, TypeError):
+                print(f"⚠️ Invalid last_active for '{self.username}': {last_active}")
+                raise
         else:
             last_date = None
 
@@ -39,16 +35,15 @@ class StreakTracker:
         if last_date == today:
             print("ℹ️ Already logged in today. No change.")
             return
-        elif last_date == today - timedelta(days=1):
+        elif last_date in [today - timedelta(days=1), today - timedelta(days=2)]:
             current_streak += 1
-            print("🔥 Streak continued!")
+            print("🔥 Streak continued (grace day allowed)!")
         else:
             if current_streak > longest_streak:
                 longest_streak = current_streak
             current_streak = 1
             print("🔄 Streak reset to 1")
 
-        # Ensure longest streak is updated
         if current_streak > longest_streak:
             longest_streak = current_streak
 
@@ -59,7 +54,7 @@ class StreakTracker:
         """, (current_streak, longest_streak, today.isoformat(), self.username))
         self.conn.commit()
 
-        print(f"✅ Updated: current_streak={current_streak}, longest_streak={longest_streak}, last_active={today}")
+        print(f"✅ Updated streak: current={current_streak}, longest={longest_streak}, last_active={today}")
 
     def close(self):
         self.conn.close()
