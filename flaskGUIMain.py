@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request, flash, session, redirect, url_for
 from DictionaryReader import DictionaryReader # Assuming dictionary_reader.py is in the same directory
 from users import Users  # Make sure Users.py exists and defines the Users class
@@ -216,11 +215,16 @@ def login():
         flash("✅ Login successful!", "success")
         print(f"✅ Session set for {username}")
 
+        streak = None
         try:
             streak = StreakTracker(username)
             streak.update_streak()
+        except Exception as e:
+            # handle or log the error
+            print(f"Error initializing streak tracker: {e}")
         finally:
-            streak.close()
+            if streak is not None:
+                streak.close()
             user.close()
 
         return redirect('/')
