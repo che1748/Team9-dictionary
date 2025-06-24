@@ -18,6 +18,7 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY", "a_default_secret_key_if_not_set_
 # This list matches the options in your HTML's <select> element.
 # It's good practice to define it in Python too for consistency and validation.
 SUPPORTED_LANGUAGES = [
+    {"code": "default", "name": "Select a Language"},
     {"code": "ar", "name": "Arabic"},
     {"code": "ca", "name": "Catalan"},
     {"code": "zh", "name": "Chinese (Simplified)"},
@@ -83,7 +84,7 @@ def index():
         history.close()
     results = []
     search_word = request.args.get('word', '').strip().lower()
-    selected_lang = request.args.get('language', 'en')
+    selected_lang = request.args.get('language', 'default')
     lang_name = " "
 
     if search_word:

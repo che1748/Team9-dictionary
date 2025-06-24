@@ -17,7 +17,7 @@ body {
 .navbar {
   background-color: #003366;
   color: white;
-  padding: 1rem 2rem;
+  padding: 1.5rem 0rem;
   position: sticky;
   top: 0;
   width: 100%;
@@ -135,6 +135,7 @@ body {
 /* Main content */
 main {
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
   padding-top: 50px;
   padding-left: 1rem;
@@ -151,7 +152,7 @@ main h2 {
 
 /* Sidebar */
 .sidebar {
-  width: 250px;
+  flex-basis: 25%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -159,25 +160,23 @@ main h2 {
   color: white;
   padding: 1rem;
   font-family: 'Poppins', sans-serif;
+  border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar h2 {
+  color: white;
 }
 
 .sidebar ul li {
   list-style: none;
 }
 
-/* Content */
-.content-area {
-  flex-grow: 1;
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
 
+/* results */
 .results {
+  flex-basis: 55%;
   padding: 2rem;
-  margin: 0 auto;
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -274,6 +273,13 @@ main h2 {
   border-radius: 8px;
 }
 
+.hamburger {
+  display: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+
 /* Mobile */
 @media (max-width: 768px) {
   .navbar {
@@ -281,16 +287,44 @@ main h2 {
     padding: 1rem;
   }
 
+  .hamburger {
+    display: block;
+  }
+
   .nav-container {
+    width: 100%;
     flex-direction: column;
     align-items: center;
     text-align: center;
   }
 
+  
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    background-color: #003366;
+    position: absolute;
+    top: 60px;
+    right: 0;
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .nav-links.active {
+    display: flex;
+  }
+
   .nav-left,
   .nav-center,
   .nav-right {
+    display: flex;
+    justify-content: space-between;
     width: 100%;
+  }
+
+  .nav-center {
+    display: flex;
+    justify-content: center;
   }
 
   .nav-form {
@@ -302,13 +336,12 @@ main h2 {
   .nav-form select,
   .nav-form input[type="text"],
   .nav-form button {
-    width: 90%;
     max-width: 400px;
     margin: 0.25rem 0;
   }
 
   .nav-form button {
-    right: 1rem;
+    top: 80px;
   }
 
   .nav-links {
@@ -319,6 +352,7 @@ main h2 {
   }
 
   .auth-links {
+    display: none;
     flex-direction: row;
     justify-content: center;
     gap: 0.5rem;
@@ -329,11 +363,11 @@ main h2 {
     padding-top: 2rem;
   }
 
-.nav-left .logo {
-  width: 150px;
-  height: 40px;
-  display: inline;
-}
+  .nav-left .logo {
+    width: 150px;
+    height: 40px;
+    display: inline;
+  }
 
   .sidebar {
     width: 100%;
@@ -341,8 +375,6 @@ main h2 {
     align-items: center;
     text-align: center;
     padding: 1rem;
-    box-shadow: none;
-    border-radius: 0;
   }
 
   .sidebar ul {
@@ -352,18 +384,5 @@ main h2 {
     gap: 1rem;
     padding: 0;
     margin: 0;
-  }
-
-  .results,
-  .content-area {
-    width: 100%;
-    padding: 1rem;
-    margin: 0;
-    box-shadow: none;
-    border-radius: 0;
-  }
-
-  .content-area img {
-    max-width: 80%;
   }
 }

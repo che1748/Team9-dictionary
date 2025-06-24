@@ -20,12 +20,17 @@
         <a href="{{ url_for('index') }}">
           <img src="{{ url_for('static', filename='images/logo-dark.png') }}" alt="Logo" class="logo">
         </a>
+
+        <div class="hamburger" onclick="toggleMenu()">
+          ☰
+        </div>
       </div>
+
 
       <!-- CENTER: Language & Search -->
       <div class="nav-center">
         <form class="nav-form" action="#" method="GET">
-          <label for="language" class="visually-hidden">Select language</label>
+          <!-- <label for="language" class="visually-hidden">Select language</label> -->
           <select name="language" id="language" required>
             {% for lang in languages %}
             <option value="{{ lang.code }}" {% if lang.code==selected_lang %}selected{% endif %}>
@@ -53,50 +58,47 @@
         </div>
       </div>
 
+
     </div>
   </nav>
 
   <main>
 
     <div class="sidebar">
-      <h3>Quick Links</h3>
-      <ul>
-      <li><a href="#">Favorites</a></li>
-      <li><a href="#">Recent Searches</a></li>
-      </ul>
-
-      <div class="content-area">
-      <!-- All your result content goes here -->
-      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" width="150">
-      </div>
-
       {% if username %}
       <div class="user-info">
-      <h2>Welcome, {{ username }}!</h2>
-      <p>🔥 Current Streak: {{ current_streak }} days</p>
-      <p>🏆 Longest Streak: {{ longest_streak }} days</p>
-      <a href="{{ url_for('logout') }}">Logout</a>
+        <h2>Welcome, {{ username }}!</h2>
+        <p>🔥 Current Streak: {{ current_streak }} days</p>
+        <p>🏆 Longest Streak: {{ longest_streak }} days</p>
+        <a href="{{ url_for('logout') }}">Logout</a>
       </div>
 
-      
+
       <div class="recent-lookups-header">
-      <h3>Recent Lookups</h3>
-      {% if recent_lookups %}
-      <a href="{{ url_for('clear_lookup_history') }}"
-        onclick="return confirm('Are you sure you want to clear your lookup history?');">Clear Data</a>
-      {% else %}
-      <p>No recent lookups.</p>
-      {% endif %}
+        <h3>Recent Lookups</h3>
+        {% if recent_lookups %}
+        <a href="{{ url_for('clear_lookup_history') }}"
+          onclick="return confirm('Are you sure you want to clear your lookup history?');">Clear Data</a>
+        {% else %}
+        <p>No recent lookups.</p>
+        {% endif %}
       </div>
       <ul class="recent-lookups">
-      {% for lookup in recent_lookups %}
-      <li>
-        <span class="lookup-counter">{{ loop.index }}.</span>
-        {{ lookup[0] }} ({{ lookup[1] }}) - {{ lookup[2] }}
-      </li>
-      {% endfor %}
+        {% for lookup in recent_lookups %}
+        <li>
+          <span class="lookup-counter">{{ loop.index }}.</span>
+          {{ lookup[0] }} ({{ lookup[1] }}) - {{ lookup[2] }}
+        </li>
+        {% endfor %}
       </ul>
       {% endif %}
+
+
+      <h3>Quick Links</h3>
+      <ul>
+        <li><a href="#">Favorites</a></li>
+        <li><a href="#">Recent Searches</a></li>
+      </ul>
     </div>
 
     <div class="results">
@@ -139,6 +141,12 @@
 
   </main>
 
+
+  <script>
+    function toggleMenu() {
+      document.getElementById("navLinks").classList.toggle("active");
+    }
+  </script>
 </body>
 
 </html>
