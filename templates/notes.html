@@ -1,39 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dictionary Notes</title>
     <style>
-        .note { 
+        .note {
             border: 1px solid #ddd;
             padding: 15px;
             margin-bottom: 10px;
             border-radius: 5px;
         }
+
         .word {
             font-weight: bold;
             color: #2c3e50;
         }
+
         .date {
             color: #7f8c8d;
             font-size: 0.9em;
         }
     </style>
 </head>
+
 <body>
-    <h1>Your Dictionary Notes</h1>
-    
-    {% if notes %}
-        {% for (word, note, timestamp) in notes %}
-        <div class="note">
-            <div class="word">{{ word }}</div>
-            <div class="text">{{ note }}</div>
-            <div class="date">{{ timestamp }}</div>
+    <!-- background animation -->
+    <section>
+        <div class="animated-bg">
+            <span class="word small fast" style="top: 15%; left: 20%;">Dictionary</span>
+            <span class="word medium" style="top: 15%; left: 80%;">Dictionnaire</span>
+            <span class="word large slow" style="top: 50%; left: 90%;">Wörterbuch</span>
+            <span class="word medium fast" style="top: 60%; left: 60%;">辞書</span>
+            <span class="word small" style="top: 30%; left: 0%;">قاموس</span>
+            <span class="word" style="top: 70%; left: 30%;">शब्दकोश</span>
+            <span class="word" style="top: 35%; left: 70%;">사전</span>
+            <span class="word" style="top: 85%; left: 50%;">พจนานุกรม</span>
+            <span class="word" style="top: 55%; left: 2%;">Kamus</span>
+            <span class="word" style="top: 42%; left: 72%;">辞典</span>
+            <span class="word" style="top: 80%; left: 10%;">Dizionario</span>
+            <span class="word" style="top: 90%; left: 90%;">Словарь</span>
         </div>
-        {% endfor %}
+    </section>
+    <h1>Your Dictionary Notes</h1>
+
+    {% if notes %}
+    {% for (word, note, timestamp) in notes %}
+    <div class="note">
+        <div class="word">{{ word }}</div>
+        <div class="text">{{ note }}</div>
+        <div class="date">{{ timestamp }}</div>
+    </div>
+    {% endfor %}
     {% else %}
-        <p>No notes found.</p>
+    <p>No notes found.</p>
     {% endif %}
 </body>
+
 </html>
