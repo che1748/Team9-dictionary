@@ -89,8 +89,6 @@
         <p>🏆 Longest Streak: {{ longest_streak }} days</p>
         <a href="{{ url_for('logout') }}">Logout</a>
       </div>
-
-
       <div class="recent-lookups-header">
         <h3>Recent Lookups</h3>
         {% if recent_lookups %}
@@ -99,6 +97,8 @@
         {% else %}
         <p>No recent lookups.</p>
         {% endif %}
+
+
       </div>
       <ul class="recent-lookups">
         {% for lookup in recent_lookups %}
@@ -146,6 +146,7 @@
             </ul>
             <p>No definitions available for this entry.</p>
             {% endif %}
+
         </div>
         {% endfor %}
         {% elif search_word %}
@@ -153,6 +154,7 @@
         {% else %}
         <p class="no-results">Enter a word and select a language to search the dictionary.</p>
         {% endif %}
+        
       </div>
     </div>
 
