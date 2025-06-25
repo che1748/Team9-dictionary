@@ -1,1 +1,15 @@
+# 🔁 Python bytecode and cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 📦 Virtual environments (if any)
+venv/
+.env/
+
+# 🗃️ SQLite database files
 *.db
+
+# 🧠 VSCode settings (optional)
+.vscode/
