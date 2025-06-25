@@ -4,7 +4,7 @@ import os
 DB_PATH = 'user_file.db'
 LOOKUP_PATH = 'lookup_history.db'
 
-def get_user_connection(username):
+def get_user_connection():
     """Returns a connection to the user database."""
     return sqlite3.connect(DB_PATH)
 
