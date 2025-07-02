@@ -108,20 +108,20 @@
         <a href="{{ url_for('logout') }}">Logout</a>
       </div>
       <div class="recent-lookups-header">
+        <h3>Recent Lookups</h3>
         {% if recent_lookups %}
         <ul class="recent-lookups">
           {% for lookup in recent_lookups %}
           <li>
             <span class="lookup-counter">{{ loop.index }}.</span>
-            {{ lookup[0] }} ({{ lookup[1] }}) - {{ lookup[2] }}
+            <span>{{ lookup[0] }} ({{ lookup[1] }}) - {{ lookup[2] }}</span>
           </li>
           {% endfor %}
+          <li>
+            <a href="{{ url_for('clear_lookup_history') }}"
+              onclick="return confirm('Are you sure you want to clear your lookup history?');">Clear Data</a>
+          </li>
         </ul>
-        {% endif %}
-        <h3>Recent Lookups</h3>
-        {% if recent_lookups %}
-        <a href="{{ url_for('clear_lookup_history') }}"
-          onclick="return confirm('Are you sure you want to clear your lookup history?');">Clear Data</a>
         {% else %}
         <p>No recent lookups.</p>
         {% endif %}
@@ -178,7 +178,7 @@
             {{ def.original }}
             {% if def.translated %}
             <br />
-            <em style="color: #444;">→ {{ def.translated }}</em>
+            <em class="translated-def">→ {{ def.translated }}</em>
             {% endif %}
           </li>
           {% endfor %}

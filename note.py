@@ -7,7 +7,7 @@ def take_notes(word, notes):
     the word, the note, and the time.
     '''
     
-    current_timme = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     con = sqlite3.connect("dic_note.db")
     cur = con.cursor()
@@ -28,7 +28,7 @@ def take_notes(word, notes):
 
     # add notes into the database
     cur.execute("INSERT INTO note (word, notes, time) VALUES (?,?,?)",
-            (word, notes, current_timme)  )
+            (word, notes, current_time)  )
 
 
     con.commit()
@@ -48,14 +48,14 @@ def delete_note(word):
     con = sqlite3.connect('dic_note.db')
     cur = con.cursor()
 
-    cur.execute("DELETE FROM note WHERE word = ?", (word))
+    cur.execute("DELETE FROM note WHERE word = ?", (word,))
 
     con.commit()
     con.close()
 
 
 def delete_all_notes():
-    con = sqlite3.connect('dictionary.db')
+    con = sqlite3.connect('dic_note.db')
     cur = con.cursor()
     
     # Delete all records from notes table
