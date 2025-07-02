@@ -88,8 +88,8 @@ def index():
         history = LookupHistory(username)
         recent_raw = history.get_recent_history(limit=10)
         recent_lookups = [
-            (word, get_lang_name(code), timestamp)
-            for word, code, timestamp in recent_raw
+            (word, get_lang_name(source), get_lang_name(target), timestamp)
+            for word, source, target, timestamp in recent_raw
         ]
         history.close()
 
@@ -105,11 +105,11 @@ def index():
     if request.method == 'POST':
         search_word = request.form.get('word', '').strip().lower()
         selected_lang = request.form.get('language', 'default')
-        target_lang = request.form.get('target_lang', 'en')
+        target_lang = request.form.get('target_lang', 'default')
     else:
-        search_word = ''
-        selected_lang = 'default'
-        target_lang = 'en'
+        search_word = request.args.get('word', '').strip().lower()
+        selected_lang = request.args.get('source_lang', 'default')
+        target_lang = request.args.get('target_lang', 'default')
 
     selected_target_lang = target_lang
     source_lang = selected_lang
@@ -130,10 +130,12 @@ def index():
             if results:
                 flash(f'Found results for "{search_word}" in {lang_name}.', 'success')
 
-                if username:
-                    history = LookupHistory(username)
-                    history.log_search(search_word, selected_lang)
-                    history.close()
+            if username:
+                    with LookupHistory(username) as history:
+                        history.log_search(search_word, source_lang, target_lang)
+
+                    with LanguagePairs() as lang_pairs:
+                        lang_pairs.increment_language_pair_usage(username, source_lang, target_lang)
             else:
                 flash(f'No results found for "{search_word.upper()}" in {lang_name}.', 'info')
 
@@ -286,51 +288,15 @@ def lookup():
     # Log the lookup and usage
     username = session.get('username')
     if username:
-        # Log lookup history
         history = LookupHistory(username)
-        history.log_search(word, target_lang)  # still logging only target_lang
+        history.log_search(word, source_lang, target_lang)
         history.close()
-        lang_pairs = LanguagePairs()
 
-        # Track language pair usage
+    with LanguagePairs() as lang_pairs:
         lang_pairs.increment_language_pair_usage(username, source_lang, target_lang)
-
-        #close the database connection
-        lang_pairs.close()
 
     # Pass the query back to the index to render a result
     return redirect(url_for('index', word=word, source_lang=source_lang, target_lang=target_lang))
-
-"""# The following commented-out code is an example of how the form might look in your HTML template."""
-# <form class="nav-form" action="{{ url_for('lookup') }}" method="POST">
-#   <!-- Source language -->
-#   <select name="source_lang" id="source_lang" required>
-#     {% for lang in languages %}
-#     <option value="{{ lang.code }}" {% if lang.code == source_lang %}selected{% endif %}>
-#       {{ lang.name }}
-#     </option>
-#     {% endfor %}
-#   </select>
-
-#   <!-- Target language -->
-#   <select name="target_lang" id="target_lang" required>
-#     {% for lang in languages %}
-#     <option value="{{ lang.code }}" {% if lang.code == selected_lang %}selected{% endif %}>
-#       {{ lang.name }}
-#     </option>
-#     {% endfor %}
-#   </select>
-
-#   <!-- Word input -->
-#   <input type="text" id="word" name="word" placeholder="Enter a word..." value="{{ search_word }}" required>
-
-#   <!-- Submit button -->
-#   <button type="submit">
-#     <span class="material-symbols-outlined">search</span>
-#   </button>
-# </form>
-
-
 
 
 

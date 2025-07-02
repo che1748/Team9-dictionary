@@ -8,20 +8,28 @@ class LookupHistory:
         self.conn = get_lookup_connection()
         self.cursor = self.conn.cursor()
 
-    def log_search(self, word, language_code):  
+    def log_search(self, word, source_lang, target_lang):  
         self.cursor.execute(
-            "INSERT INTO lookup_history (username, word, language_code, timestamp) VALUES (?, ?, ?, ?)",
-            (self.username, word, language_code, datetime.now())
+            "INSERT INTO lookup_history (username, word, source_lang, target_lang, timestamp) VALUES (?, ?, ?, ?, ?)",
+            (self.username, word, source_lang, target_lang, datetime.now())
         )
         self.conn.commit()
-        print(f"✅ Word '{word}' looked up in '{language_code}' successfully.")
+        print(f"✅ Word '{word}' looked up from '{source_lang}' to '{target_lang}' successfully.")
+
 
     def get_recent_history(self, limit=10):
         self.cursor.execute(
-            "SELECT word, language_code, timestamp FROM lookup_history WHERE username = ? ORDER BY timestamp DESC LIMIT ?",
+            """
+            SELECT word, source_lang, target_lang, timestamp
+            FROM lookup_history
+            WHERE username = ?
+            ORDER BY timestamp DESC
+            LIMIT ?
+            """,
             (self.username, limit)
         )
         return self.cursor.fetchall()
+
 
     def clear_all_history(self):
         self.cursor.execute(
@@ -34,4 +42,4 @@ class LookupHistory:
 
     def close(self):
         self.conn.close()
-        print("🛑 Database connection closed.")
+        print("🛑 Database connection close in lookup_history.")

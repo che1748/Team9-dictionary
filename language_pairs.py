@@ -41,4 +41,10 @@ class LanguagePairs:
 
     def close(self):
         self.conn.close()
-        print("🛑 Language pairs database connection closed.")
+        print("🛑 Language pairs database connection closed on language_pairs.py")
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()

@@ -12,17 +12,17 @@ def get_user_connection():
 def get_lookup_connection():
     """Returns a connection to the lookup history database."""
     return sqlite3.connect(LOOKUP_PATH)
+
 def get_language_connection():
     """Returns a connection to the language pairs database."""
     return sqlite3.connect(LANGUAGE_PAIRS)
 
 def initialize_db():
-    """Initializes both databases with required tables."""
+    """Initializes all databases with required tables."""
 
-    # Initialize users table
+    # === Users DB ===
     user_conn = get_user_connection()
     user_cursor = user_conn.cursor()
-
     user_cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,41 +34,42 @@ def initialize_db():
             last_active TEXT
         )
     ''')
-
     user_conn.commit()
     user_conn.close()
 
-    # Initialize lookup_history table
+    # === Lookup History DB ===
     lookup_conn = get_lookup_connection()
     lookup_cursor = lookup_conn.cursor()
 
+    # Drop old version and recreate clean table
+    lookup_cursor.execute("DROP TABLE IF EXISTS lookup_history;")
     lookup_cursor.execute('''
-        CREATE TABLE IF NOT EXISTS lookup_history (
+        CREATE TABLE lookup_history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL,
             word TEXT NOT NULL,
-            language_code TEXT NOT NULL,
+            source_lang TEXT NOT NULL,
+            target_lang TEXT NOT NULL,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
-
     lookup_conn.commit()
     lookup_conn.close()
+    print("✅ lookup_history table recreated.")
 
-    # Initialize language_pairs table
+    # === Language Pairs DB ===
     language_conn = get_language_connection()
     language_cursor = language_conn.cursor()
     language_cursor.execute('''
         CREATE TABLE IF NOT EXISTS language_pairs (
-             username TEXT,
-            source_lang TEXT,
-            target_lang TEXT,
+            username TEXT NOT NULL,
+            source_lang TEXT NOT NULL,
+            target_lang TEXT NOT NULL,
             usage_count INTEGER DEFAULT 0,
             PRIMARY KEY (username, source_lang, target_lang)
         )
     ''')
-    
     language_conn.commit()
     language_conn.close()
 
-    print("✅ Databases initialized successfully.")
+    print("✅ All databases initialized successfully.")

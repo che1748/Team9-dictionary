@@ -29,33 +29,34 @@
 
       <!-- CENTER: Language & Search -->
       <div class="nav-center">
-        <form class="nav-form">
-          <form action="{{ url_for('index') }}" method="POST" class="nav-center-form">
-            <label for="source_lang">From:</label>
-            <select name="language" id="source_lang" required>
-              {% for lang in languages %}
-              <option value="{{ lang.code }}" {% if lang.code==selected_lang %}selected{% endif %}>
-                {{ lang.name }}
-              </option>
-              {% endfor %}
-            </select>
+        <form action="{{ url_for('lookup') }}" method="POST" class="nav-form">
+          <label for="source_lang">From:</label>
+          <select name="source_lang" id="source_lang" required>
+            {% for lang in languages %}
+            <option value="{{ lang.code }}" {% if lang.code==selected_lang %}selected{% endif %}>
+              {{ lang.name }}
+            </option>
+            {% endfor %}
+          </select>
 
-            <label for="target_lang">To:</label>
-            <select name="target_lang" id="target_lang" required>
-              {% for lang in languages %}
-              <option value="{{ lang.code }}" {% if lang.code==selected_target_lang %}selected{% endif %}>
-                {{ lang.name }}
-              </option>
-              {% endfor %}
-            </select>
+          <label for="target_lang">To:</label>
+          <select name="target_lang" id="target_lang" required>
+            {% for lang in languages %}
+            <option value="{{ lang.code }}" {% if lang.code==selected_target_lang %}selected{% endif %}>
+              {{ lang.name }}
+            </option>
+            {% endfor %}
+          </select>
 
-            <input type="text" id="word" name="word" placeholder="Enter a word..." value="{{ search_word }}" required>
-            <button type="submit">
-              <span class="material-symbols-outlined">search</span>
-            </button>
-          </form>
+          <input type="text" id="word" name="word" placeholder="Enter a word..." value="{{ search_word }}" required>
+
+          <button type="submit">
+            <span class="material-symbols-outlined">search</span>
+          </button>
         </form>
       </div>
+
+
 
 
 
@@ -107,6 +108,16 @@
         <a href="{{ url_for('logout') }}">Logout</a>
       </div>
       <div class="recent-lookups-header">
+        {% if recent_lookups %}
+        <ul class="recent-lookups">
+          {% for lookup in recent_lookups %}
+          <li>
+            <span class="lookup-counter">{{ loop.index }}.</span>
+            {{ lookup[0] }} ({{ lookup[1] }}) - {{ lookup[2] }}
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
         <h3>Recent Lookups</h3>
         {% if recent_lookups %}
         <a href="{{ url_for('clear_lookup_history') }}"
@@ -122,7 +133,7 @@
             <ul class="list-group list-group-flush">
               {% for src, tgt, count in lang_stats %}
               <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ src }} → {{ tgt }}
+                <span>{{ src }} → {{ tgt }}</span>
                 <span class="badge bg-primary rounded-pill">{{ count }}</span>
               </li>
               {% endfor %}
@@ -132,14 +143,8 @@
         {% endif %}
 
       </div>
-      <ul class="recent-lookups">
-        {% for lookup in recent_lookups %}
-        <li>
-          <span class="lookup-counter">{{ loop.index }}.</span>
-          {{ lookup[0] }} ({{ lookup[1] }}) - {{ lookup[2] }}
-        </li>
-        {% endfor %}
-      </ul>
+
+
       {% endif %}
 
 
