@@ -4,6 +4,7 @@ import os
 DB_PATH = 'user_file.db'
 LOOKUP_PATH = 'lookup_history.db'
 LANGUAGE_PAIRS = 'language_pairs.db'
+NOTES = 'dic_note.db'
 
 def get_user_connection():
     """Returns a connection to the user database."""
@@ -16,6 +17,9 @@ def get_lookup_connection():
 def get_language_connection():
     """Returns a connection to the language pairs database."""
     return sqlite3.connect(LANGUAGE_PAIRS)
+def get_notes_connection():
+    """Returns a connection to the notes database."""
+    return sqlite3.connect(NOTES)
 
 def initialize_db():
     """Initializes all databases with required tables."""
@@ -71,5 +75,23 @@ def initialize_db():
     ''')
     language_conn.commit()
     language_conn.close()
+
+    # === Notes DB ===
+    note_connection = get_notes_connection()
+    notes_cursor = note_connection.cursor()
+    # Ensure the 'note' table exists
+    notes_cursor.execute("""
+        CREATE TABLE IF NOT EXISTS note (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            word TEXT NOT NULL,
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    note_connection.commit()
+    note_connection.close()
+
+
+
 
     print("✅ All databases initialized successfully.")

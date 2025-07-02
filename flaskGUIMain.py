@@ -255,21 +255,11 @@ def logout():
 
 @app.route('/notes')
 def show_notes():
-    conn = sqlite3.connect('dic_note.db')
-    cursor = conn.cursor()
-    # Ensure the 'note' table exists
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS note (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            word TEXT NOT NULL,
-            notes TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    cursor.execute("SELECT word, notes, created_at FROM note ORDER BY created_at")
-    notes = cursor.fetchall()
-    conn.close()
-    return render_template('notes.html', notes=notes)
+    username = session.get('username')
+    if not username:
+        flash("⚠️ You need to log in to view notes.", "warning")
+        return redirect(url_for('index'))
+    return render_template('notes.html')
 
 @app.route('/lookup', methods=['POST'])
 def lookup():
