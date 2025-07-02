@@ -3,6 +3,7 @@ import os
 
 DB_PATH = 'user_file.db'
 LOOKUP_PATH = 'lookup_history.db'
+LANGUAGE_PAIRS = 'language_pairs.db'
 
 def get_user_connection():
     """Returns a connection to the user database."""
@@ -11,6 +12,9 @@ def get_user_connection():
 def get_lookup_connection():
     """Returns a connection to the lookup history database."""
     return sqlite3.connect(LOOKUP_PATH)
+def get_language_connection():
+    """Returns a connection to the language pairs database."""
+    return sqlite3.connect(LANGUAGE_PAIRS)
 
 def initialize_db():
     """Initializes both databases with required tables."""
@@ -50,5 +54,21 @@ def initialize_db():
 
     lookup_conn.commit()
     lookup_conn.close()
+
+    # Initialize language_pairs table
+    language_conn = get_language_connection()
+    language_cursor = language_conn.cursor()
+    language_cursor.execute('''
+        CREATE TABLE IF NOT EXISTS language_pairs (
+             username TEXT,
+            source_lang TEXT,
+            target_lang TEXT,
+            usage_count INTEGER DEFAULT 0,
+            PRIMARY KEY (username, source_lang, target_lang)
+        )
+    ''')
+    
+    language_conn.commit()
+    language_conn.close()
 
     print("✅ Databases initialized successfully.")

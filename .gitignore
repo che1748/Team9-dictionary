@@ -9,7 +9,7 @@ venv/
 .env/
 
 # 🗃️ SQLite database files
-*.db
+
 
 # 🧠 VSCode settings (optional)
 .vscode/

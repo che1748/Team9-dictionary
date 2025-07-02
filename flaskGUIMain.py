@@ -1,12 +1,14 @@
 from flask import Flask, render_template, request, flash, session, redirect, url_for
 from DictionaryReader import DictionaryReader # Assuming dictionary_reader.py is in the same directory
-from users import Users  # Make sure Users.py exists and defines the Users class
+from users import Users  
 import os
 from dotenv import load_dotenv
 import sqlite3
 from streakTracker import StreakTracker
 from db import initialize_db, get_user_connection
 from lookup_history import LookupHistory
+from language_pairs import LanguagePairs
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -58,14 +60,21 @@ SUPPORTED_LANGUAGES = [
     {"code": "uk", "name": "Ukrainian"},
 ]
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST'])
 def index():
     username = session.get('username')
-    
+
     current_streak = None
     longest_streak = None
     recent_lookups = []
     delete_history = None
+    lang_stats = []
+    results = []
+    translated_word = None
+ 
+
+    def get_lang_name(code):
+        return next((lang['name'] for lang in SUPPORTED_LANGUAGES if lang['code'] == code), code)
 
     if username:
         conn = get_user_connection()
@@ -75,17 +84,36 @@ def index():
         conn.close()
         if streak_data:
             current_streak, longest_streak = streak_data
+
         history = LookupHistory(username)
         recent_raw = history.get_recent_history(limit=10)
         recent_lookups = [
-        (word, next((lang['name'] for lang in SUPPORTED_LANGUAGES if lang['code'] == code), code), timestamp)
-        for word, code, timestamp in recent_raw]
-
+            (word, get_lang_name(code), timestamp)
+            for word, code, timestamp in recent_raw
+        ]
         history.close()
-    results = []
-    search_word = request.args.get('word', '').strip().lower()
-    selected_lang = request.args.get('language', 'default')
-    lang_name = " "
+
+        lang_pair_obj = LanguagePairs()
+        raw_stats = lang_pair_obj.get_top_pairs(username)
+        lang_pair_obj.close()
+
+        lang_stats = [
+            (get_lang_name(src), get_lang_name(tgt), count)
+            for src, tgt, count in raw_stats
+        ]
+
+    if request.method == 'POST':
+        search_word = request.form.get('word', '').strip().lower()
+        selected_lang = request.form.get('language', 'default')
+        target_lang = request.form.get('target_lang', 'en')
+    else:
+        search_word = ''
+        selected_lang = 'default'
+        target_lang = 'en'
+
+    selected_target_lang = target_lang
+    source_lang = selected_lang
+    lang_name = get_lang_name(selected_lang)
 
     if search_word:
         for lang in SUPPORTED_LANGUAGES:
@@ -94,57 +122,20 @@ def index():
 
         try:
             reader = DictionaryReader(search_word, selected_lang)
-            raw_results = reader.get_entry()
-            if raw_results:
-                results = []
-                for entry in raw_results:
-                    if isinstance(entry, dict):
-                        headword_data = entry.get("headword")
-                        word_text = "N/A"
-                        pos_text = "N/A"
 
-                        if headword_data:
-                            if isinstance(headword_data, dict):
-                                word_text = headword_data.get("text", "N/A")
-                                pos_text = headword_data.get("pos", "N/A")
-                            elif isinstance(headword_data, list) and len(headword_data) > 0:
-                                first_headword = headword_data[0]
-                                if isinstance(first_headword, dict):
-                                    word_text = first_headword.get("text", "N/A")
-                                    pos_text = first_headword.get("pos", "N/A")
+            translated_word = reader.get_translation(target_lang, source_lang=selected_lang)
 
-                        formatted_entry = {
-                            "word": word_text,
-                            "pos": pos_text,
-                            "definitions": []
-                        }
+            results = reader.get_definitions(target_lang=target_lang)
 
-                        senses = entry.get("senses", [])
-                        if senses:
-                            for i, sense in enumerate(senses[:3], 1):
-                                definition = sense.get("definition", "No definition found")
-                                formatted_entry["definitions"].append(f"{i}. {definition}")
-                        else:
-                            formatted_entry["definitions"].append("No definitions found for this entry.")
-
-                        results.append(formatted_entry)
-                    else:
-                        flash(f"Warning: Received unexpected data from API for '{search_word}'.", 'warning')
-
+            if results:
                 flash(f'Found results for "{search_word}" in {lang_name}.', 'success')
-                
-                if username and search_word and raw_results:
+
+                if username:
                     history = LookupHistory(username)
                     history.log_search(search_word, selected_lang)
                     history.close()
-                elif username and search_word:
-                    delete_history = LookupHistory(username)
-                    delete_history.clear_history(search_word, selected_lang)
-                    delete_history.close()
-
             else:
                 flash(f'No results found for "{search_word.upper()}" in {lang_name}.', 'info')
-            
 
         except ValueError as e:
             flash(f'Configuration Error: {e}. Please check your .env file.', 'danger')
@@ -156,13 +147,17 @@ def index():
                            current_streak=current_streak,
                            longest_streak=longest_streak,
                            languages=SUPPORTED_LANGUAGES,
+                           selected_target_lang=selected_target_lang,
                            search_word=search_word,
                            selected_lang=selected_lang,
                            results=results,
                            lang_name=lang_name,
                            recent_lookups=recent_lookups,
-                           delete_history=delete_history
-                           )
+                           delete_history=delete_history,
+                           source_lang=source_lang,
+                           lang_stats=lang_stats,
+                           translated_word=translated_word)
+
 
 
 
@@ -274,7 +269,66 @@ def show_notes():
     conn.close()
     return render_template('notes.html', notes=notes)
 
+@app.route('/lookup', methods=['POST'])
+def lookup():
+    word = request.form.get('word', '').strip()
+    source_lang = request.form.get('source_lang', 'default')
+    target_lang = request.form.get('target_lang', 'default')
 
+    if not word:
+        flash("⚠️ Please enter a word to look up.", "warning")
+        return redirect(url_for('index'))
+
+    if source_lang == 'default' or target_lang == 'default':
+        flash("⚠️ Please select both source and target languages.", "warning")
+        return redirect(url_for('index'))
+
+    # Log the lookup and usage
+    username = session.get('username')
+    if username:
+        # Log lookup history
+        history = LookupHistory(username)
+        history.log_search(word, target_lang)  # still logging only target_lang
+        history.close()
+        lang_pairs = LanguagePairs()
+
+        # Track language pair usage
+        lang_pairs.increment_language_pair_usage(username, source_lang, target_lang)
+
+        #close the database connection
+        lang_pairs.close()
+
+    # Pass the query back to the index to render a result
+    return redirect(url_for('index', word=word, source_lang=source_lang, target_lang=target_lang))
+
+"""# The following commented-out code is an example of how the form might look in your HTML template."""
+# <form class="nav-form" action="{{ url_for('lookup') }}" method="POST">
+#   <!-- Source language -->
+#   <select name="source_lang" id="source_lang" required>
+#     {% for lang in languages %}
+#     <option value="{{ lang.code }}" {% if lang.code == source_lang %}selected{% endif %}>
+#       {{ lang.name }}
+#     </option>
+#     {% endfor %}
+#   </select>
+
+#   <!-- Target language -->
+#   <select name="target_lang" id="target_lang" required>
+#     {% for lang in languages %}
+#     <option value="{{ lang.code }}" {% if lang.code == selected_lang %}selected{% endif %}>
+#       {{ lang.name }}
+#     </option>
+#     {% endfor %}
+#   </select>
+
+#   <!-- Word input -->
+#   <input type="text" id="word" name="word" placeholder="Enter a word..." value="{{ search_word }}" required>
+
+#   <!-- Submit button -->
+#   <button type="submit">
+#     <span class="material-symbols-outlined">search</span>
+#   </button>
+# </form>
 
 
 

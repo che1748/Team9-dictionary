@@ -29,21 +29,36 @@
 
       <!-- CENTER: Language & Search -->
       <div class="nav-center">
-        <form class="nav-form" action="#" method="GET">
-          <!-- <label for="language" class="visually-hidden">Select language</label> -->
-          <select name="language" id="language" required>
+        <form action="{{ url_for('index') }}" method="POST" class="nav-center-form">
+          <label for="source_lang">From:</label>
+          <select name="language" id="source_lang" required>
             {% for lang in languages %}
             <option value="{{ lang.code }}" {% if lang.code==selected_lang %}selected{% endif %}>
               {{ lang.name }}
             </option>
             {% endfor %}
           </select>
+
+          <label for="target_lang">To:</label>
+          <select name="target_lang" id="target_lang" required>
+            {% for lang in languages %}
+            <option value="{{ lang.code }}" {% if lang.code==selected_target_lang %}selected{% endif %}>
+              {{ lang.name }}
+            </option>
+            {% endfor %}
+          </select>
+
           <input type="text" id="word" name="word" placeholder="Enter a word..." value="{{ search_word }}" required>
           <button type="submit">
             <span class="material-symbols-outlined">search</span>
           </button>
         </form>
       </div>
+
+
+
+
+
 
       <!-- RIGHT: Nav Links and Auth -->
       <div id="navLinks" class="nav-right">
@@ -98,6 +113,21 @@
         <p>No recent lookups.</p>
         {% endif %}
 
+        {% if lang_stats %}
+        <div class="card mt-4">
+          <div class="card-body">
+            <h4 class="card-title">🌍 Top Language Pairs</h4>
+            <ul class="list-group list-group-flush">
+              {% for src, tgt, count in lang_stats %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ src }} → {{ tgt }}
+                <span class="badge bg-primary rounded-pill">{{ count }}</span>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+        {% endif %}
 
       </div>
       <ul class="recent-lookups">
@@ -115,48 +145,46 @@
       <ul>
         <li><a href="#">Favorites</a></li>
         <li><a href="#">Recent Searches</a></li>
+        <li><a href="/notes">Notes</a></li>
       </ul>
     </div>
 
     <div class="results">
-      <div class="flash-messages">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="{{ category }}">{{ message }}</div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
-      </div>
+      {% if results %}
+      <h3>Results for "{{ search_word }}" ({{ lang_name }})</h3>
 
-      <h2>Multi-Lingual Dictionary Lookup</h2>
+      {% for entry in results %}
+      <div class="word-entry">
+        <!-- Word and part of speech -->
+        <h4>
+          {{ entry.word }}
+          {% if translated_word %}
+          → {{ translated_word }}
+          {% endif %}
+          <span class="pos">({{ entry.pos }}) → ({{ entry.translated_pos }})</span>
+        </h4>
 
-      <div class="results-section">
-        {% if results %}
-        <h3>Results for "{{ search_word }}" in {{ lang_name }}:</h3>
-        {% for entry in results %}
-        <div class="word-entry">
-          <h4>{{ entry.word }} ({{ entry.pos }})</h4>
-          {% if entry.definitions %}
-          <ul>
-            <ul>
-              {% for def in entry.definitions %}
-              <li>{{ def }}</li>
-              {% endfor %}
-            </ul>
-            <p>No definitions available for this entry.</p>
+        <!-- Definitions and their translations -->
+        <ul>
+          {% for def in entry.definitions %}
+          <li>
+            {{ def.original }}
+            {% if def.translated %}
+            <br />
+            <em style="color: #444;">→ {{ def.translated }}</em>
             {% endif %}
-
-        </div>
-        {% endfor %}
-        {% elif search_word %}
-        <p class="no-results">No results found for "{{ search_word }}" in {{ lang_name }}.</p>
-        {% else %}
-        <p class="no-results">Enter a word and select a language to search the dictionary.</p>
-        {% endif %}
-        
+          </li>
+          {% endfor %}
+        </ul>
       </div>
-    </div>
+      {% endfor %}
+
+      {% elif search_word %}
+      <p class="no-results">No results found for "{{ search_word }}" in {{ lang_name }}.</p>
+      {% else %}
+      <p class="no-results">Enter a word and select a language to search the dictionary.</p>
+      {% endif %}
+
 
   </main>
 

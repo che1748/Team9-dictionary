@@ -39,21 +39,21 @@ class StreakTracker:
             last_date = date.fromisoformat(str(last_active)) if last_active else None
         except (ValueError, TypeError):
             logging.warning(f"Invalid last_active format for '{self.username}': {last_active}")
-            return
+            last_date = None
 
         logging.info(f"{self.username} - Last Active: {last_date}, Today: {today}")
 
         if last_date == today:
             logging.info("Already active today. No streak change.")
             return
-        elif last_date in [today - timedelta(days=1), today - timedelta(days=2)]:
+        elif last_date is not None and last_date in [today - timedelta(days=1), today - timedelta(days=2)]:
             current_streak += 1
             logging.info("Streak continued with grace day!")
         else:
             if current_streak > longest_streak:
                 longest_streak = current_streak
             current_streak = 1
-            logging.info("Streak reset to 1.")
+            logging.info("Streak reset to 1 or first activity.")
 
         if current_streak > longest_streak:
             longest_streak = current_streak
@@ -70,9 +70,6 @@ class StreakTracker:
             logging.error(f"Failed to update streak for '{self.username}': {e}")
             print(f"❌ Failed to update streak for '{self.username}': {e}")
 
-    def close(self) -> None:
-            self.conn.close()
-            logging.info("Database connection closed.")
     def close(self) -> None:
         try:
             self.conn.close()

@@ -20,10 +20,15 @@ class Users:
                 (self.username, hashed_pw, date.today().isoformat())
             )
             self.conn.commit()
+            return True  # ✅ Success!
         except sqlite3.IntegrityError:
             print(f"❌ Username '{self.username}' already exists.")
+            return False  # ❌ Duplicate
         except Exception as e:
             print(f"⚠️ Could not add user '{self.username}': {e}")
+            return False  # ❌ General failure
+
+
 
 
     def verify_login(self):
