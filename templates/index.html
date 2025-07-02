@@ -29,29 +29,31 @@
 
       <!-- CENTER: Language & Search -->
       <div class="nav-center">
-        <form action="{{ url_for('index') }}" method="POST" class="nav-center-form">
-          <label for="source_lang">From:</label>
-          <select name="language" id="source_lang" required>
-            {% for lang in languages %}
-            <option value="{{ lang.code }}" {% if lang.code==selected_lang %}selected{% endif %}>
-              {{ lang.name }}
-            </option>
-            {% endfor %}
-          </select>
+        <form class="nav-form">
+          <form action="{{ url_for('index') }}" method="POST" class="nav-center-form">
+            <label for="source_lang">From:</label>
+            <select name="language" id="source_lang" required>
+              {% for lang in languages %}
+              <option value="{{ lang.code }}" {% if lang.code==selected_lang %}selected{% endif %}>
+                {{ lang.name }}
+              </option>
+              {% endfor %}
+            </select>
 
-          <label for="target_lang">To:</label>
-          <select name="target_lang" id="target_lang" required>
-            {% for lang in languages %}
-            <option value="{{ lang.code }}" {% if lang.code==selected_target_lang %}selected{% endif %}>
-              {{ lang.name }}
-            </option>
-            {% endfor %}
-          </select>
+            <label for="target_lang">To:</label>
+            <select name="target_lang" id="target_lang" required>
+              {% for lang in languages %}
+              <option value="{{ lang.code }}" {% if lang.code==selected_target_lang %}selected{% endif %}>
+                {{ lang.name }}
+              </option>
+              {% endfor %}
+            </select>
 
-          <input type="text" id="word" name="word" placeholder="Enter a word..." value="{{ search_word }}" required>
-          <button type="submit">
-            <span class="material-symbols-outlined">search</span>
-          </button>
+            <input type="text" id="word" name="word" placeholder="Enter a word..." value="{{ search_word }}" required>
+            <button type="submit">
+              <span class="material-symbols-outlined">search</span>
+            </button>
+          </form>
         </form>
       </div>
 
