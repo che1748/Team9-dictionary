@@ -31,7 +31,7 @@
   
   <h2>Login</h2>
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% with messages = get_flashed_messages(with_categories=True) %}
   {% if messages %}
   <div class="flash">
     {% for category, message in messages %}
@@ -42,11 +42,11 @@
   {% endwith %}
 
   <form action="/login" method="POST" class="form-container">
-    <label for="username">Username:</label><br>
-    <input type="text" name="username" required placeholder="Enter your username" title="Username"><br><br>
+    <label for="username-input">Username:</label><br>
+    <input type="text" id="username-input" name="username" required placeholder="Enter your username" title="Username"><br><br>
 
-    <label for="password">Password:</label><br>
-    <input type="password" name="password" required placeholder="Enter your password" title="Password"><br><br>
+    <label for="password-input">Password:</label><br>
+    <input type="password" id="password-input" name="password" required placeholder="Enter your password" title="Password"><br><br>
 
     <button type="submit">Login</button>
   </form>
