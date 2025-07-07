@@ -46,20 +46,18 @@ def initialize_db():
     lookup_cursor = lookup_conn.cursor()
 
     # Drop old version and recreate clean table
-    lookup_cursor.execute("DROP TABLE IF EXISTS lookup_history;")
     lookup_cursor.execute('''
-        CREATE TABLE lookup_history (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL,
-            word TEXT NOT NULL,
-            source_lang TEXT NOT NULL,
-            target_lang TEXT NOT NULL,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
+    CREATE TABLE IF NOT EXISTS lookup_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL,
+        word TEXT NOT NULL,
+        source_lang TEXT NOT NULL,
+        target_lang TEXT NOT NULL,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
     lookup_conn.commit()
     lookup_conn.close()
-    print("✅ lookup_history table recreated.")
 
     # === Language Pairs DB ===
     language_conn = get_language_connection()
