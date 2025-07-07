@@ -30,7 +30,7 @@
 
   <h2>Register</h2>
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
+
   {% if messages %}
   <div class="flash">
     {% for category, message in messages %}
@@ -38,7 +38,7 @@
     {% endfor %}
   </div>
   {% endif %}
-  {% endwith %}
+
 
   <form action="/register" method="POST" class="form-container">
     <label for="username">Username:</label><br>

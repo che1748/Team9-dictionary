@@ -9,6 +9,10 @@ def normalize_for_translator(lang_code):
     """Normalize language codes for compatibility with GoogleTranslator."""
     if lang_code == "br":
         return "pt"
+    if lang_code == "zh":
+        return "zh-CN"
+    if lang_code == "tw":
+        return "zh-TW"
     return lang_code
 
 class DictionaryReader:
