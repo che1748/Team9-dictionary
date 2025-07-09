@@ -1,16 +1,104 @@
-.note {
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 5px;
+body {
+  font-family: 'Inter', sans-serif;
+  padding: 2rem;
+  background-color: #f4f6f8;
+  color: #333;
+  position: relative;
+  z-index: 1;
 }
 
-.word {
+h1, h2 {
+  text-align: center;
+  color: #003366;
+}
+
+form {
+    margin: auto;
+    width: 100%;
+    max-width: 600px;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+  box-sizing: border-box;
+}
+
+textarea:focus {
+  outline: 1px solid #003366;
+}
+
+input[type="submit"] {
+    margin-top: 1.5rem;
+    width: 100%;
+    background-color: #1e4f91;
+    color: white;
+    border: none;
+    padding: 0.8rem;
+    border-radius: 4px;
+    font-size: 1rem;
     font-weight: bold;
-    color: #2c3e50;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.date {
-    color: #7f8c8d;
-    font-size: 0.9em;
+input[type="submit"]:hover {
+    background-color: #003366;
+}
+
+.note {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  padding: 1.25rem;
+  margin: 1rem auto;
+  max-width: 600px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.note .word {
+  font-weight: 700;
+  color: #003366;
+  margin-bottom: 0.25rem;
+  font-size: 1.2rem;
+}
+
+.note .text {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.note .date {
+  color: #7f8c8d;
+  font-size: 0.85rem;
+  text-align: right;
+  display: block;
+}
+
+hr {
+  margin: 2rem auto;
+  max-width: 600px;
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+p {
+  text-align: center;
+  color: #666;
+  font-style: italic;
 }

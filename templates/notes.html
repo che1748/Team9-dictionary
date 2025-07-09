@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
      <link rel="stylesheet" href="{{ url_for('static', filename='accounts.css') }}">
+     <link rel="stylesheet" href="{{ url_for('static', filename='notes.css') }}">
     <title>Dictionary Notes</title>
 </head>
 
@@ -29,13 +30,10 @@
     </section>
     <h1>Your Dictionary Notes</h1>
 
-    <h1>Welcome, {{ username }}!</h1>
+    <h2>Welcome, {{ username }}!</h2>
 
-
-
-    <h2>Add a Note</h2>
     <form method="POST" action="{{ url_for('show_notes') }}">
-        <label for="note">Note:</label><br>
+        <label for="note">Add a Note:</label><br>
         <textarea id="note" name="note" rows="4" cols="40" required></textarea><br><br>
 
         <input type="submit" value="Save Note">
