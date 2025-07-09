@@ -8,6 +8,7 @@ from streakTracker import StreakTracker
 from db import initialize_db, get_user_connection
 from lookup_history import LookupHistory
 from language_pairs import LanguagePairs
+from note import Note
 
 load_dotenv()
 
@@ -225,7 +226,7 @@ def login():
                 streak.close()
             user.close()
 
-        return redirect('/')
+        return redirect(url_for('index'))
     else:
         flash("❌ Invalid username or password.", "danger")
         print("❌ Login failed")
@@ -249,17 +250,28 @@ def clear_lookup_history():
 def logout():
     session.pop('username', None)  # Remove only the username from session
     flash("🚪 You have been logged out.", "info")
-    return redirect('/')
+    return redirect(url_for('index'))
 
 
-
-@app.route('/notes')
+@app.route('/notes', methods=['GET', 'POST'])
 def show_notes():
     username = session.get('username')
     if not username:
         flash("⚠️ You need to log in to view notes.", "warning")
         return redirect(url_for('index'))
-    return render_template('notes.html')
+
+    note_obj = Note(username)
+    if request.method == 'POST':
+        note_content = request.form.get('note', '').strip()
+        if note_content:
+            note_obj.save_note(note_content)
+            flash("✅ Note saved.", "success")
+        else:
+            flash("⚠️ Note cannot be empty.", "warning")
+
+    notes = note_obj.get_notes()
+    note_obj.close()
+    return render_template('notes.html', username=username, notes=notes)
 
 @app.route('/lookup', methods=['POST'])
 def lookup():

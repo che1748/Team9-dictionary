@@ -75,19 +75,20 @@ def initialize_db():
     language_conn.close()
 
     # === Notes DB ===
-    note_connection = get_notes_connection()
-    notes_cursor = note_connection.cursor()
+    notes_conn = get_notes_connection()
+    notes_cursor = notes_conn.cursor()
     # Ensure the 'note' table exists
     notes_cursor.execute("""
         CREATE TABLE IF NOT EXISTS note (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
             word TEXT NOT NULL,
             notes TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
-    note_connection.commit()
-    note_connection.close()
+    notes_conn.commit()
+    notes_conn.close()
 
 
 
