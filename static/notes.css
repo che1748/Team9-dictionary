@@ -1,0 +1,16 @@
+.note {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.word {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.date {
+    color: #7f8c8d;
+    font-size: 0.9em;
+}
