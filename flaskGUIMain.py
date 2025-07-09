@@ -263,8 +263,9 @@ def show_notes():
     note_obj = Note(username)
     if request.method == 'POST':
         note_content = request.form.get('note', '').strip()
+        
         if note_content:
-            note_obj.save_note(note_content)
+            note_obj.take_notes(note_content)
             flash("✅ Note saved.", "success")
         else:
             flash("⚠️ Note cannot be empty.", "warning")
