@@ -72,10 +72,22 @@ def index():
     lang_stats = []
     results = []
     translated_word = None
- 
+    if request.method == 'POST':
+        search_word = request.form.get('word', '').strip().lower()
+        selected_lang = request.form.get('language', 'default')
+        target_lang = request.form.get('target_lang', 'default')
+    else:
+        search_word = request.args.get('word', '').strip().lower()
+        selected_lang = request.args.get('source_lang', 'default')
+        target_lang = request.args.get('target_lang', 'default')
+
+    selected_target_lang = target_lang
+    source_lang = selected_lang
 
     def get_lang_name(code):
         return next((lang['name'] for lang in SUPPORTED_LANGUAGES if lang['code'] == code), code)
+
+    lang_name = get_lang_name(selected_lang)
 
     if username:
         conn = get_user_connection()
@@ -89,9 +101,9 @@ def index():
         history = LookupHistory(username)
         recent_raw = history.get_recent_history(limit=10)
         recent_lookups = [
-            (word, get_lang_name(source), get_lang_name(target), timestamp)
-            for word, source, target, timestamp in recent_raw
-        ]
+                            (word, get_lang_name(source), get_lang_name(target), timestamp)
+                            for word, source, target, timestamp in recent_raw
+                            ]
         history.close()
 
         lang_pair_obj = LanguagePairs()
@@ -99,27 +111,16 @@ def index():
         lang_pair_obj.close()
 
         lang_stats = [
-            (get_lang_name(src), get_lang_name(tgt), count)
-            for src, tgt, count in raw_stats
-        ]
+               (get_lang_name(src), get_lang_name(tgt), count)
+               for src, tgt, count in raw_stats
+           ]
 
-    if request.method == 'POST':
-        search_word = request.form.get('word', '').strip().lower()
-        selected_lang = request.form.get('language', 'default')
-        target_lang = request.form.get('target_lang', 'default')
-    else:
-        search_word = request.args.get('word', '').strip().lower()
-        selected_lang = request.args.get('source_lang', 'default')
-        target_lang = request.args.get('target_lang', 'default')
+        
 
-    selected_target_lang = target_lang
-    source_lang = selected_lang
-    lang_name = get_lang_name(selected_lang)
 
     if search_word:
-        for lang in SUPPORTED_LANGUAGES:
-            if lang["code"] == selected_lang:
-                lang_name = lang["name"]
+        lang_name = get_lang_name(selected_lang)
+           
 
         try:
             reader = DictionaryReader(search_word, selected_lang)
@@ -129,16 +130,15 @@ def index():
             results = reader.get_definitions(target_lang=target_lang)
 
             if results:
-                flash(f'Found results for "{search_word}" in {lang_name}.', 'success')
-
-            if username:
-                    with LookupHistory(username) as history:
-                        history.log_search(search_word, source_lang, target_lang)
-
-                    with LanguagePairs() as lang_pairs:
-                        lang_pairs.increment_language_pair_usage(username, source_lang, target_lang)
+             
+                    
+                flash(f'Found results for "{search_word.upper()}" in {lang_name}.', 'success')
             else:
                 flash(f'No results found for "{search_word.upper()}" in {lang_name}.', 'info')
+
+            if username:
+                    with LanguagePairs() as lang_pairs:
+                        lang_pairs.increment_language_pair_usage(username, source_lang, target_lang)
 
         except ValueError as e:
             flash(f'Configuration Error: {e}. Please check your .env file.', 'danger')
@@ -288,15 +288,25 @@ def lookup():
         flash("⚠️ Please select both source and target languages.", "warning")
         return redirect(url_for('index'))
 
-    # Log the lookup and usage
-    username = session.get('username')
-    if username:
-        history = LookupHistory(username)
-        history.log_search(word, source_lang, target_lang)
-        history.close()
-
-    with LanguagePairs() as lang_pairs:
-        lang_pairs.increment_language_pair_usage(username, source_lang, target_lang)
+    # Verify the word exists before logging
+    try:
+        reader = DictionaryReader(word, source_lang)
+        results = reader.get_definitions(target_lang=target_lang)
+        
+        if results:
+            # Only log if the word exists and has results
+            username = session.get('username')
+            if username:
+                history = LookupHistory(username)
+                history.log_search(word, source_lang, target_lang)
+                history.close()
+                
+                with LanguagePairs() as lang_pairs:
+                    lang_pairs.increment_language_pair_usage(username, source_lang, target_lang)
+        
+    except Exception as e:
+        # Handle API errors but don't log failed lookups
+        pass
 
     # Pass the query back to the index to render a result
     return redirect(url_for('index', word=word, source_lang=source_lang, target_lang=target_lang))
